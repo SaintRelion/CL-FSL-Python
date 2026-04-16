@@ -4,13 +4,25 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import os
 
+physical_devices = tf.config.list_physical_devices("GPU")
+if len(physical_devices) > 0:
+    print(f"✅ GPU Detected: {physical_devices}")
+    # This prevents TF from hogging all VRAM immediately
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+else:
+    print("⚠️ No GPU found. Running on CPU.")
+
 # ------------------- Hyperparameters -------------------
 SEED = 42
 BATCH_SIZE = 32
-EPOCHS = 80  # Increased slightly since the features are now cleaner
+EPOCHS = 1  # 80  # Increased slightly since the features are now cleaner
 LEARNING_RATE = 1e-3
-# Our new feature count from build_dataset.py
-INPUT_SHAPE = (30, 18)
+
+# Represents the fixed sequence length (time steps)
+TARGET_FRAMES = 30
+# Hand1(7) + Hand2(7) + 10 Pillar Distances = 24
+FEATURE_COUNT = 24
+INPUT_SHAPE = (TARGET_FRAMES, FEATURE_COUNT)
 
 # ------------------- Data Loading -------------------
 X = np.load("data/X.npy")
@@ -24,14 +36,17 @@ print(f"Number of classes: {num_classes}")
 
 # Split data
 X_train, X_val, y_train, y_val = train_test_split(
-    X, y, test_size=0.2, random_state=SEED, stratify=y
+    X,
+    y,
+    test_size=0.2,
+    random_state=SEED,  # stratify=y
 )
 
 # ------------------- Model Architecture -------------------
 # We use Bidirectional to capture the "preparation" and "retraction" of signs
 model = tf.keras.Sequential(
     [
-        tf.keras.layers.Input(shape=(30, 18), name="input_layer"),
+        tf.keras.layers.Input(shape=INPUT_SHAPE, name="input_layer"),
         tf.keras.layers.Masking(mask_value=0.0),
         tf.keras.layers.Bidirectional(
             tf.keras.layers.GRU(
@@ -85,7 +100,7 @@ model.save("models/gesture_model.keras")
 # Optional: Convert to TFLite for your Flutter app immediately
 run_model = tf.function(lambda x: model(x))
 concrete_func = run_model.get_concrete_function(
-    tf.TensorSpec([1, 30, 18], model.inputs[0].dtype)
+    tf.TensorSpec([1, TARGET_FRAMES, FEATURE_COUNT], model.inputs[0].dtype)
 )
 
 converter = tf.lite.TFLiteConverter.from_concrete_functions([concrete_func])

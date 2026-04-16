@@ -3,187 +3,207 @@ import os
 import cv2
 import numpy as np
 import json
-from fsl_helper import resample_sequence
-
+import re
 import mediapipe as mp
 from mediapipe.tasks.python import vision
-from mediapipe.tasks.python.vision import drawing_utils, drawing_styles
+from fsl_helper import resample_sequence
 
-import numpy as np
-import os
-import re
-
-
-def sanitize_label(label):
-    label = label.replace("'", "_").replace("’", "_").replace(" ", "_")
-    label = re.sub(r"_+", "_", label)
-    return label.upper()
-
-
-# ------------------- Paths -------------------
+# ------------------- Configuration -------------------
 ROOT_DIR = "common_clips"
 OUTPUT_DIR = "data"
 TARGET_FRAMES = 30
-# Hand1(5 ext + 2 ori) + Hand2(5 ext + 2 ori) + Proximity(4 bools) = 18
-FEATURE_COUNT = 18
+# Hand1(7) + Hand2(7) + 10 Pillar Distances = 24
+FEATURE_COUNT = 24
 
-# Aliases for Tasks API
+# Aliases
 BaseOptions = mp.tasks.BaseOptions
-HandLandmarkerOptions = vision.HandLandmarkerOptions
 HandLandmarker = vision.HandLandmarker
-PoseLandmarkerOptions = vision.PoseLandmarkerOptions
 PoseLandmarker = vision.PoseLandmarker
-FaceLandmarkerOptions = vision.FaceLandmarkerOptions
 FaceLandmarker = vision.FaceLandmarker
-VisionRunningMode = vision.RunningMode
 
 
-# ------------------- MediaPipe Options -------------------
-def create_hand_model(
-    MODEL_PATH="models/hand_landmarker.task", NUM_HANDS=2, MIN_CONFIDENCE=0.5
-):
-    options = HandLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=MODEL_PATH),
-        num_hands=NUM_HANDS,
-        min_hand_detection_confidence=MIN_CONFIDENCE,
+# ------------------- Model Creation -------------------
+def create_models():
+    # Using the standardized model paths from your setup
+    h_opt = vision.HandLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path="models/hand_landmarker.task"),
+        num_hands=2,
+        min_hand_detection_confidence=0.5,
     )
-    return HandLandmarker.create_from_options(options)
-
-
-def create_pose_model(
-    MODEL_PATH="models/pose_landmarker_full.task", MIN_CONFIDENCE=0.5
-):
-    options = PoseLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=MODEL_PATH),
-        min_pose_detection_confidence=MIN_CONFIDENCE,
+    p_opt = vision.PoseLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path="models/pose_landmarker_full.task"),
+        min_pose_detection_confidence=0.5,
     )
-    return PoseLandmarker.create_from_options(options)
-
-
-def create_face_model(MODEL_PATH="models/face_landmarker.task", MIN_CONFIDENCE=0.5):
-    options = FaceLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=MODEL_PATH),
-        min_face_detection_confidence=MIN_CONFIDENCE,
+    f_opt = vision.FaceLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path="models/face_landmarker.task"),
+        min_face_detection_confidence=0.5,
     )
-    return FaceLandmarker.create_from_options(options)
+
+    return (
+        HandLandmarker.create_from_options(h_opt),
+        PoseLandmarker.create_from_options(p_opt),
+        FaceLandmarker.create_from_options(f_opt),
+    )
+
+
+# ------------------- Visualization Helper -------------------
+def get_heatmap_color(dist, threshold=0.15):
+    """Converts distance into a BGR color (Blue for cold, Red for hot)."""
+    # Normalize distance: 0.0 is 'on top of pillar', 1.0 is 'far away'
+    score = np.clip(dist / threshold, 0, 1)
+
+    # Simple Linear Interpolation: Red (0,0,255) to Cyan (255,255,0)
+    # Blue component increases as you get farther
+    # Red component increases as you get closer
+    r = int(255 * (1 - score))
+    g = int(255 * score)
+    b = int(255 * score)
+    return (b, g, r), score
+
+
+def draw_debug_ui(frame, pillars, hand_results, pillar_distances):
+    h, w, _ = frame.shape
+
+    # 1. Draw "Heatmap" Pillars
+    for i, (name, pos) in enumerate(pillars.items()):
+        center = (int(pos[0] * w), int(pos[1] * h))
+
+        # Get color based on the actual distance calculated in extract_frame_features
+        dist = pillar_distances[i]
+        color, score = get_heatmap_color(dist)
+
+        # Draw an outer "Glow" or "Heat Ring"
+        # Radius expands slightly when 'Hot'
+        radius = int(10 + (20 * (1 - score)))
+        thickness = int(1 + (5 * (1 - score)))
+
+        cv2.circle(frame, center, radius, color, thickness)
+        cv2.circle(frame, center, 4, color, -1)  # Core point
+
+        # Label with "Heat %"
+        heat_percent = int((1 - score) * 100)
+        cv2.putText(
+            frame,
+            f"{name} {heat_percent}%",
+            (center[0] + 15, center[1]),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.4,
+            color,
+            1,
+        )
+
+    # 2. Draw Hand Landmarks
+    if hand_results.hand_landmarks:
+        for hl in hand_results.hand_landmarks:
+            for lm in hl:
+                cv2.circle(frame, (int(lm.x * w), int(lm.y * h)), 2, (0, 255, 0), -1)
+
+    return frame
 
 
 # ------------------- Feature Extraction -------------------
-def extract_frame_features(frame, hand_model, pose_model, face_model, prev):
+def extract_frame_features(frame, hand_model, pose_model, face_model):
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
-    hand_result = hand_model.detect(mp_image)
-    face_result = face_model.detect(mp_image)
-    # Pose kept for shoulder anchors if needed, but face-width is our primary scale
-    pose_result = pose_model.detect(mp_image)
+    h_res = hand_model.detect(mp_image)
+    f_res = face_model.detect(mp_image)
+    p_res = pose_model.detect(mp_image)
 
-    # 1. Setup Anchors & Scale
-    face_width = 0.1  # Default small value
-    mouth_pos = np.array([0.5, 0.5])
-    forehead_pos = np.array([0.5, 0.2])
+    # 1. Define Pillar Anchors (Relative Coordinates)
+    pillars = {
+        "forehead": [0.5, 0.2],
+        "nose": [0.5, 0.4],
+        "mouth": [0.5, 0.5],
+        "chin": [0.5, 0.6],
+        "l_ear": [0.4, 0.4],
+        "r_ear": [0.6, 0.4],
+        "l_shoulder": [0.3, 0.8],
+        "r_shoulder": [0.7, 0.8],
+        "chest": [0.5, 0.8],
+        "neutral": [0.9, 0.9],
+    }
 
-    if face_result.face_landmarks:
-        fl = face_result.face_landmarks[0]
-        # Eye-to-eye distance for scale (Landmarks 33 and 263)
-        p1 = np.array([fl[33].x, fl[33].y])
-        p2 = np.array([fl[263].x, fl[263].y])
-        face_width = max(np.linalg.norm(p1 - p2), 1e-6)
+    if f_res.face_landmarks:
+        fl = f_res.face_landmarks[0]
+        pillars["forehead"] = [fl[10].x, fl[10].y]
+        pillars["nose"] = [fl[1].x, fl[1].y]
+        pillars["mouth"] = [(fl[13].x + fl[14].x) / 2, (fl[13].y + fl[14].y) / 2]
+        pillars["chin"] = [fl[152].x, fl[152].y]
+        pillars["l_ear"] = [fl[234].x, fl[234].y]
+        pillars["r_ear"] = [fl[454].x, fl[454].y]
 
-        # Mouth Center (Average of upper/lower lip)
-        mouth_pos = (
-            np.array([fl[13].x, fl[13].y]) + np.array([fl[14].x, fl[14].y])
-        ) / 2
-        # Forehead (Landmark 10)
-        forehead_pos = np.array([fl[10].x, fl[10].y])
+    if p_res.pose_landmarks:
+        pl = p_res.pose_landmarks[0]
+        pillars["l_shoulder"] = [pl[11].x, pl[11].y]
+        pillars["r_shoulder"] = [pl[12].x, pl[12].y]
+        pillars["chest"] = [(pl[11].x + pl[12].x) / 2, (pl[11].y + pl[12].y) / 2]
 
-    # 2. Process Hands (Extensions & Orientation)
-    hand_feat = []
-    wrist_positions = []
+    # 2. Extract Hand Landmarks (Local Geometry)
+    hand_feats = []
+    primary_wrist = None
 
-    # MediaPipe doesn't guarantee LEFT then RIGHT, but for training,
-    # we just take the first two detected slots.
     for i in range(2):
-        if hand_result.hand_landmarks and i < len(hand_result.hand_landmarks):
-            h = hand_result.hand_landmarks[i]
+        if h_res.hand_landmarks and i < len(h_res.hand_landmarks):
+            h = h_res.hand_landmarks[i]
             wrist = np.array([h[0].x, h[0].y])
-            wrist_positions.append(wrist)
+            if i == 0:
+                primary_wrist = wrist
 
-            # Use Wrist-to-Middle-Knuckle (0 to 9) as local hand scale
-            palm_len = np.linalg.norm(wrist - np.array([h[9].x, h[9].y]))
-            palm_len = max(palm_len, 1e-6)
+            # Use Wrist-to-Middle-Knuckle as local scale
+            palm_len = max(np.linalg.norm(wrist - np.array([h[9].x, h[9].y])), 1e-6)
 
-            # 5 Extensions: Wrist-to-Tip normalized by Palm
-            for tip_idx in [4, 8, 12, 16, 20]:
-                tip = np.array([h[tip_idx].x, h[tip_idx].y])
-                hand_feat.append(np.linalg.norm(tip - wrist) / palm_len)
+            # 5 finger extensions (distance from wrist to tip)
+            for tip in [4, 8, 12, 16, 20]:
+                tip_pos = np.array([h[tip].x, h[tip].y])
+                hand_feats.append(np.linalg.norm(tip_pos - wrist) / palm_len)
 
-            # Palm Orientation Vector (normalized)
-            ori_vec = (np.array([h[9].x, h[9].y]) - wrist) / palm_len
-            hand_feat.extend([ori_vec[0], ori_vec[1]])
+            # 2D Direction Vector (Orientation)
+            ori = (np.array([h[9].x, h[9].y]) - wrist) / palm_len
+            hand_feats.extend([ori[0], ori[1]])
         else:
-            hand_feat.extend([0] * 7)  # 5 extensions + 2 orientation
-            wrist_positions.append(None)
+            hand_feats.extend([0] * 7)
 
-    # 3. Proximity Triggers (The "State Machine")
-    # Threshold: approx 1.2x face width is usually a good "touching" zone
-    zone_threshold = face_width * 1.2
-    proximity_feat = []
-
-    for w in wrist_positions:
-        if w is not None:
-            near_mouth = 1 if np.linalg.norm(w - mouth_pos) < zone_threshold else 0
-            near_forehead = (
-                1 if np.linalg.norm(w - forehead_pos) < zone_threshold else 0
-            )
-            proximity_feat.extend([near_mouth, near_forehead])
+    # 3. Calculate Pillar Distances (The "Heatmap" Activation)
+    pillar_feats = []
+    for name, pos in pillars.items():
+        if primary_wrist is not None:
+            # Linear distance from wrist to anchor point
+            dist = np.linalg.norm(primary_wrist - np.array(pos))
+            pillar_feats.append(dist)
         else:
-            proximity_feat.extend([0, 0])
+            pillar_feats.append(1.0)  # Far distance if no hand detected
 
-    # 4. Final Assemble (14 Hand features + 4 Bool features)
-    feat = hand_feat + proximity_feat
-
-    # Check if we detected anything at all
-    if all(v == 0 for v in feat):
-        if prev is not None:
-            return prev, prev
-        return None, None
-
-    return feat, feat
+    debug_frame = draw_debug_ui(frame.copy(), pillars, h_res, pillar_feats)
+    return hand_feats + pillar_feats, debug_frame
 
 
-def extract_sequence_features(
-    video_path, hand_model, pose_model, face_model, show_progress=False
-):
+def extract_sequence_features(video_path, models):
     cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        return None
-
-    frames_iter = []
-    while True:
+    features = []
+    while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
-        frames_iter.append(frame)
-    cap.release()
 
-    features = []
-    prev = None
-    for frame in frames_iter:
-        feat, prev = extract_frame_features(
-            frame, hand_model, pose_model, face_model, prev
-        )
-        if feat is not None:
+        feat, debug_frame = extract_frame_features(frame, *models)
+
+        # # Visualize during processing so you can see the Pillars "hitting"
+        # cv2.imshow("FSL LINK - Build Dataset Debug", debug_frame)
+        # if cv2.waitKey(1) & 0xFF == ord("q"):
+        #     break
+
+        # Valid frame if hand data exists (not all zeros/ones)
+        if any(v != 0 and v != 1.0 for v in feat[:14]):
             features.append(feat)
 
-    # Return None if the sequence is too garbage (less than 5 frames of data)
+    cap.release()
+    cv2.destroyAllWindows()
     return features if len(features) >= 5 else None
 
 
-def build_dataset(root_dir=ROOT_DIR, max_labels=None, max_videos_per_label=None):
-    X, y = [], []
-
-    # Use your defined alphabetical list to ensure the map is consistent
+# ------------------- Dataset Builder -------------------
+def build_dataset():
     common_labels = [
         "BOY",
         "COLD",
@@ -217,37 +237,31 @@ def build_dataset(root_dir=ROOT_DIR, max_labels=None, max_videos_per_label=None)
         "YOURE_WELCOME",
     ]
     label_map = {label: i for i, label in enumerate(common_labels)}
+    models = create_models()
+    X, y = [], []
 
-    hand_model = create_hand_model()
-    pose_model = create_pose_model()
-    face_model = create_face_model()
-
-    # Iterate through the common_labels to keep directory processing in order
     for label in common_labels:
-        label_path = os.path.join(root_dir, label)
+        label_path = os.path.join(ROOT_DIR, label)
         if not os.path.isdir(label_path):
             print(f"Skipping {label}: Directory not found")
             continue
 
-        video_list = sorted([f for f in os.listdir(label_path) if f.endswith(".mp4")])
-        print(f"Processing {label} ({len(video_list)} videos)...")
+        videos = sorted([f for f in os.listdir(label_path) if f.endswith(".mp4")])
+        print(f"Processing {label} ({len(videos)} videos)...")
 
-        for vid_idx, vid in enumerate(video_list):
-            if max_videos_per_label and vid_idx >= max_videos_per_label:
-                break
-
-            raw = extract_sequence_features(
-                os.path.join(label_path, vid), hand_model, pose_model, face_model
-            )
-
+        temp = 0
+        for vid in videos:
+            raw = extract_sequence_features(os.path.join(label_path, vid), models)
             if raw:
-                # Use your existing resample_sequence to hit TARGET_FRAMES (30)
+                # Resample to 30 frames for LSTM/GRU input
                 feats = resample_sequence(raw, TARGET_FRAMES)
                 if feats is not None:
-                    assert len(feats) == TARGET_FRAMES
-                    assert len(feats[0]) == FEATURE_COUNT
                     X.append(feats)
                     y.append(label_map[label])
+
+            temp += 1
+            if temp >= 2:
+                break
 
     return np.array(X, dtype=np.float32), np.array(y), label_map
 
@@ -261,6 +275,4 @@ if __name__ == "__main__":
     with open(os.path.join(OUTPUT_DIR, "label_map.json"), "w") as f:
         json.dump(label_map, f, indent=2)
 
-    print(f"\nSuccess! Dataset built.")
-    print(f"X Shape: {X.shape} (Videos, Frames, Features)")
-    print(f"y Shape: {y.shape}")
+    print(f"\nSuccess! X Shape: {X.shape} (Videos, Frames, Features)")
