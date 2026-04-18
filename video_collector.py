@@ -15,6 +15,7 @@ SHAPE_MODEL_PATH = "models/hand_shape_model.tflite"
 
 # Pillars: Nose, Mouth, L_Shoulder, R_Shoulder, Chest, L_Ear, R_Ear
 PILLAR_COUNT = 7
+FEATURE_COUNT = 30
 
 
 def create_models():
