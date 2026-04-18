@@ -8,7 +8,7 @@ from mediapipe.tasks.python import vision
 
 # --- CONFIGURATION ---
 DATA_FILE = "data/hand_vocabulary.csv"
-SAMPLES_PER_SIGN = 30
+SAMPLES_PER_SIGN = 60
 MODEL_PATH = "models/hand_landmarker.task"
 
 if not os.path.exists("data"):

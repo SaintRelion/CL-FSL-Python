@@ -1,159 +1,211 @@
-import os
+# python
 import cv2
+import mediapipe as mp
 import numpy as np
 import tensorflow as tf
-import json
-import matplotlib.pyplot as plt
-from handsign.pillar_collector import create_models, extract_frame_features
-from fsl_helper import resample_sequence
+from mediapipe.tasks.python import vision
+import os
+import time
 
-# ------------------- Configuration -------------------
+# --- CONFIGURATION ---
 ROOT_DIR = "common_clips"
-MODEL_PATH = "models/gesture_model.keras"
-LABEL_MAP_PATH = "data/label_map.json"
+SHAPE_MODEL_PATH = "models/hand_shape_model.tflite"
+PILLAR_MODEL_PATH = "models/pillar_path_model.tflite"
+SHAPE_LABELS_PATH = "models/hand_shape_labels.txt"
+
+GESTURE_LABELS = sorted(
+    [d for d in os.listdir(ROOT_DIR) if os.path.isdir(os.path.join(ROOT_DIR, d))]
+)
+
+# --- STATE VARIABLES ---
+sequence_buffer = []
+is_collecting = False
+start_time = 0
+COLLECTION_DURATION = 1.7  # Your requested 1.7 seconds
 TARGET_FRAMES = 30
-# NEW FEATURE COUNT: 10 (Extensions) + 50 (Web Distances) = 60
-FEATURE_COUNT = 60
+last_prediction = ""
+prediction_display_until = 0
 
 
-def apply_fixed_zoom(frame, zoom_factor):
-    """Safe zoom with padding logic for zoom-out and cropping for zoom-in."""
-    h, w = frame.shape[:2]
-    if zoom_factor >= 1.0:
-        new_h, new_w = int(h / zoom_factor), int(w / zoom_factor)
-        y1, x1 = (h - new_h) // 2, (w - new_w) // 2
-        crop = frame[y1 : y1 + new_h, x1 : x1 + new_w]
-        return cv2.resize(crop, (w, h))
-    else:
-        new_h, new_w = int(h * zoom_factor), int(w * zoom_factor)
-        resized = cv2.resize(frame, (new_w, new_h))
-        canvas = np.zeros_like(frame)
-        pad_h, pad_w = (h - new_h) // 2, (w - new_w) // 2
-        canvas[pad_h : pad_h + resized.shape[0], pad_w : pad_w + resized.shape[1]] = (
-            resized
+# --- INITIALIZATION (Same as before) ---
+def load_tflite(path):
+    interp = tf.lite.Interpreter(model_path=path)
+    interp.allocate_tensors()
+    return interp, interp.get_input_details(), interp.get_output_details()
+
+
+shape_interp, shape_in, shape_out = load_tflite(SHAPE_MODEL_PATH)
+path_interp, path_in, path_out = load_tflite(PILLAR_MODEL_PATH)
+NUM_SHAPE_CLASSES = shape_out[0]["shape"][-1]
+
+with open(SHAPE_LABELS_PATH, "r") as f:
+    SHAPE_LABELS = [line.strip() for line in f.readlines()]
+
+BaseOptions = mp.tasks.BaseOptions
+h_mod = vision.HandLandmarker.create_from_options(
+    vision.HandLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path="models/hand_landmarker.task"),
+        num_hands=2,
+    )
+)
+p_mod = vision.PoseLandmarker.create_from_options(
+    vision.PoseLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path="models/pose_landmarker_full.task")
+    )
+)
+f_mod = vision.FaceLandmarker.create_from_options(
+    vision.FaceLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path="models/face_landmarker.task")
+    )
+)
+
+
+def get_shape_probs(lms):
+    wrist, m_knk = lms[0], lms[9]
+    scale = max(((m_knk.x - wrist.x) ** 2 + (m_knk.y - wrist.y) ** 2) ** 0.5, 1e-6)
+    feats = []
+    for lm in lms:
+        feats.extend([(lm.x - wrist.x) / scale, (lm.y - wrist.y) / scale])
+    for t, k in zip([4, 8, 12, 16, 20], [2, 5, 9, 13, 17]):
+        feats.append(
+            (((lms[t].x - wrist.x) ** 2 + (lms[t].y - wrist.y) ** 2) ** 0.5)
+            / max(
+                (((lms[k].x - wrist.x) ** 2 + (lms[k].y - wrist.y) ** 2) ** 0.5), 1e-6
+            )
         )
-        return canvas
+    for p1, p2 in [(8, 12), (12, 16), (16, 20), (4, 8)]:
+        feats.append(
+            (((lms[p1].x - lms[p2].x) ** 2 + (lms[p1].y - lms[p2].y) ** 2) ** 0.5)
+            / scale
+        )
+    shape_interp.set_tensor(shape_in[0]["index"], np.array([feats], dtype=np.float32))
+    shape_interp.invoke()
+    return shape_interp.get_tensor(shape_out[0]["index"])[0]
 
 
-def plot_diagnostics(
-    snapshot, feats_30, prediction, inv_label_map, label_name, pred_label
-):
-    """
-    Displays an updated dual-pane diagnostic:
-    Left: Actual spatial path based on the 'Web' distances.
-    Right: Probability bar chart for top predictions.
-    """
-    fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(16, 8), gridspec_kw={"width_ratios": [2, 1]}
+# --- MAIN LOOP ---
+cap = cv2.VideoCapture(0)
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+    frame = cv2.flip(frame, 1)
+    h, w, _ = frame.shape
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+
+    h_res, p_res, f_res = (
+        h_mod.detect(mp_img),
+        p_mod.detect(mp_img),
+        f_mod.detect(mp_img),
     )
 
-    # --- PANE 1: NEURAL WEB SPATIAL TRUTH ---
-    ax1.imshow(cv2.cvtColor(snapshot, cv2.COLOR_BGR2RGB))
-    feats_arr = np.array(feats_30)  # Convert list to array for slicing
+    # 1. Update Pillar Coords
+    f_scale = 0.2
+    cur_pillars = [[0.5, 0.4], [0.5, 0.5], [0.3, 0.7], [0.7, 0.7], [0.5, 0.7]]
+    if f_res.face_landmarks:
+        fl = f_res.face_landmarks[0]
+        cur_pillars[0], cur_pillars[1] = [fl[1].x, fl[1].y], [
+            (fl[13].x + fl[14].x) / 2,
+            (fl[13].y + fl[14].y) / 2,
+        ]
+        f_scale = max(abs(fl[10].y - fl[152].y), 1e-6)
+    if p_res.pose_landmarks:
+        pl = p_res.pose_landmarks[0]
+        cur_pillars[2], cur_pillars[3], cur_pillars[4] = (
+            [pl[11].x, pl[11].y],
+            [pl[12].x, pl[12].y],
+            [(pl[11].x + pl[12].x) / 2, (pl[11].y + pl[12].y) / 2],
+        )
 
-    # We plot the 'Neural Web' activity (Features 10-60)
-    # Every 10 features represent one finger's relationship to the 10 pillars
-    for t in range(0, TARGET_FRAMES, 3):
-        prog = t / (TARGET_FRAMES - 1)
-        dot_color = (1.0, 1.0 - prog, 1.0)  # Yellow to Magenta
+    # 2. Hand Detection & Triggering
+    hand_detected = h_res.hand_landmarks is not None and len(h_res.hand_landmarks) > 0
+    full_vector = []
+    active_shapes = ["None", "None"]
 
-        # Check which finger was 'closest' to any pillar at this time
-        # Indices 10 to 60 contain the 50 web distances
-        web_slice = feats_arr[t, 10:60]
-        if np.min(web_slice) < 0.2:  # Only plot if there was a close interaction
-            ax1.scatter([], [], color=dot_color, s=50, edgecolors="white")
+    if hand_detected:
+        # Start collection if not already
+        if not is_collecting:
+            is_collecting = True
+            start_time = time.time()
+            sequence_buffer = []  # Clear old data
+            print("Hand detected! Starting 1.7s collection...")
 
-    ax1.set_title(f"Neural Web Path: {label_name}")
-    ax1.axis("off")
+        for i in range(2):
+            if i < len(h_res.hand_landmarks):
+                lms = h_res.hand_landmarks[i]
+                probs = get_shape_probs(lms)
+                active_shapes[i] = SHAPE_LABELS[np.argmax(probs)]
+                wrist = np.array([lms[0].x, lms[0].y])
+                tips = np.mean(
+                    [[lms[t].x, lms[t].y] for t in [4, 8, 12, 16, 20]], axis=0
+                )
+                w_dists = [
+                    np.linalg.norm(wrist - np.array(p)) / f_scale for p in cur_pillars
+                ]
+                t_dists = [
+                    np.linalg.norm(tips - np.array(p)) / f_scale for p in cur_pillars
+                ]
+                full_vector += list(probs) + w_dists + t_dists + [1.0]
+                # Draw skeleton
+                for lm in lms:
+                    cv2.circle(
+                        frame, (int(lm.x * w), int(lm.y * h)), 3, (0, 255, 0), -1
+                    )
+            else:
+                full_vector += [0.0] * NUM_SHAPE_CLASSES + [0.0] * 10 + [0.0]
 
-    # --- PANE 2: PROBABILITY BAR CHART ---
-    top_indices = np.argsort(prediction)[-5:]
-    top_scores = prediction[top_indices]
-    top_labels = [inv_label_map.get(str(i), "Unknown") for i in top_indices]
+        if is_collecting:
+            sequence_buffer.append(full_vector)
+    else:
+        # If hand lost during collection, we reset (Optional: could also just wait)
+        if is_collecting and (time.time() - start_time) > 0.3:  # 0.3s grace period
+            is_collecting = False
+            sequence_buffer = []
 
-    colors = ["gray"] * 4 + ["green" if pred_label == label_name else "red"]
-    ax2.barh(top_labels, top_scores, color=colors)
-    ax2.set_xlim(0, 1.1)
-    ax2.set_title("Softmax Probabilities")
-    for i, v in enumerate(top_scores):
-        ax2.text(v + 0.02, i, f"{v*100:.1f}%", fontweight="bold")
+    # 3. Time-Based Prediction
+    if is_collecting:
+        elapsed = time.time() - start_time
+        # Progress Bar
+        bar_w = int(w * (elapsed / COLLECTION_DURATION))
+        cv2.rectangle(frame, (0, h - 15), (bar_w, h), (0, 255, 255), -1)
 
-    plt.tight_layout()
-    plt.show(block=False)
-    plt.pause(4)
-    plt.close()
+        if elapsed >= COLLECTION_DURATION:
+            # Standardize buffer to 30 frames (exactly what model expects)
+            from fsl_helper import resample_sequence
 
+            final_seq = resample_sequence(sequence_buffer, TARGET_FRAMES)
 
-def run_diagnostic_test():
-    print(f"🔄 Loading model with {FEATURE_COUNT} inputs...")
-    model = tf.keras.models.load_model(MODEL_PATH)
+            input_data = np.array([final_seq], dtype=np.float32)
+            path_interp.set_tensor(path_in[0]["index"], input_data)
+            path_interp.invoke()
+            prediction = path_interp.get_tensor(path_out[0]["index"])[0]
 
-    with open(LABEL_MAP_PATH, "r") as f:
-        # Standardize loading regardless of int/str keys in JSON
-        raw_map = json.load(f)
-        inv_map = {str(v): k for k, v in raw_map.items()}
+            idx = np.argmax(prediction)
+            if prediction[idx] > 0.7:
+                last_prediction = f"{GESTURE_LABELS[idx]} ({prediction[idx]*100:.0f}%)"
+                prediction_display_until = time.time() + 2.0  # Show for 2 seconds
 
-    models = create_models()  #
+            # Reset
+            is_collecting = False
+            sequence_buffer = []
 
-    for label_name in sorted(os.listdir(ROOT_DIR)):
-        label_path = os.path.join(ROOT_DIR, label_name)
-        if not os.path.isdir(label_path):
-            continue
+    # 4. Display Results
+    if time.time() < prediction_display_until:
+        cv2.rectangle(frame, (10, 10), (500, 80), (0, 0, 0), -1)
+        cv2.putText(
+            frame,
+            f"JUTSU: {last_prediction}",
+            (20, 60),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1.2,
+            (0, 255, 0),
+            3,
+        )
 
-        skip_label = False
-        for video_file in [f for f in os.listdir(label_path) if f.endswith(".mp4")]:
-            if skip_label:
-                break
+    cv2.imshow("Timed Jutsu Master", frame)
+    if cv2.waitKey(1) & 0xFF == 27:
+        break
 
-            # Random Fixed Zoom test (0.8x to 1.5x)
-            zoom = np.random.uniform(0.8, 1.5)
-            print(f"🔬 Testing: {label_name}/{video_file} (Zoom: {zoom:.2f}x)")
-
-            cap = cv2.VideoCapture(os.path.join(label_path, video_file))
-            raw_features, snapshot = [], None
-
-            while cap.isOpened():
-                ret, frame = cap.read()
-                if not ret:
-                    break
-
-                test_frame = apply_fixed_zoom(frame, zoom)
-                # This uses your updated 60-feature extractor
-                feat, debug = extract_frame_features(test_frame, *models)
-
-                # Hand detected if any of the 10 finger extensions > 0
-                if any(v > 0 for v in feat[:10]):
-                    raw_features.append(feat)
-                    if snapshot is None:
-                        snapshot = debug.copy()
-
-                cv2.imshow("FSL Diagnostic Window", debug)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord("n"):
-                    skip_label = True
-                    break
-                if key == ord("q"):
-                    return
-
-            cap.release()
-            if skip_label or len(raw_features) < 10:
-                continue
-
-            # Resample and Inference
-            feats_30 = resample_sequence(raw_features, TARGET_FRAMES)
-            input_data = np.expand_dims(np.array(feats_30), axis=0)
-
-            prediction = model.predict(input_data, verbose=0)[0]
-            pred_idx = np.argmax(prediction)
-            pred_label = inv_map.get(str(pred_idx), "Unknown")
-
-            # Dual-Pane Spatial + Probability Logic
-            plot_diagnostics(
-                snapshot, feats_30, prediction, inv_map, label_name, pred_label
-            )
-
-    cv2.destroyAllWindows()
-
-
-if __name__ == "__main__":
-    run_diagnostic_test()
+cap.release()
+cv2.destroyAllWindows()

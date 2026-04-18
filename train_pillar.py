@@ -1,4 +1,3 @@
-# python
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
@@ -21,77 +20,32 @@ BATCH_SIZE = 128
 EPOCHS = 100
 LEARNING_RATE = 1e-3
 
-# Matches the new Dual-Hand vector from your pillar_collector.py
 TARGET_FRAMES = 30
-FEATURE_COUNT = 50  # (Num_Shapes + 5 Wrist + 5 Tip + 1 Presence) * 2
+FEATURE_COUNT = 30  # (7 Wrist + 7 Tip + 1 Presence) * 2 hands
 INPUT_SHAPE = (TARGET_FRAMES, FEATURE_COUNT)
 
-# ------------------- Data Loading -------------------
-# Loading the X.npy and y.npy built by your updated collector
 X = np.load("data/X.npy")
 y = np.load("data/y.npy")
-
 num_classes = len(np.unique(y))
 
-print(f"Loaded X shape: {X.shape}")
-print(f"Loaded y shape: {y.shape}")
-print(f"Number of classes: {num_classes}")
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Split data
-X_train, X_val, y_train, y_val = train_test_split(
-    X, y, test_size=0.2, random_state=SEED, stratify=y
-)
-
-# ------------------- Model Architecture -------------------
-# Using the hierarchical logic where we process Shape Probs + Pillar Paths
 model = tf.keras.Sequential(
     [
-        tf.keras.layers.Input(shape=INPUT_SHAPE, name="jutsu_input"),
-        tf.keras.layers.Masking(mask_value=0.0),  # Ignore padding/missing hand frames
-        # First GRU layer - Unrolled for TFLite compatibility
-        tf.keras.layers.GRU(
-            64, return_sequences=True, unroll=True, reset_after=True, name="gru_path_1"
-        ),
-        tf.keras.layers.Dropout(0.3),
-        # Second GRU layer - Finalizing the temporal sequence
-        tf.keras.layers.GRU(64, unroll=True, reset_after=True, name="gru_path_2"),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Input(shape=(30, FEATURE_COUNT)),
+        tf.keras.layers.Masking(mask_value=0.0),
+        tf.keras.layers.GRU(64, return_sequences=True, unroll=True),
+        tf.keras.layers.GRU(64, unroll=True),
         tf.keras.layers.Dense(64, activation="relu"),
         tf.keras.layers.Dense(num_classes, activation="softmax"),
     ]
 )
 
-# ------------------- Training Configuration -------------------
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
-    loss="sparse_categorical_crossentropy",
-    metrics=["accuracy"],
+    optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
 )
+model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=100, batch_size=32)
 
-model.summary()
-
-# Callbacks for AWS run
-callbacks = [
-    tf.keras.callbacks.EarlyStopping(
-        monitor="val_loss", patience=15, restore_best_weights=True
-    ),
-    tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5),
-]
-
-# ------------------- Execute Training -------------------
-history = model.fit(
-    X_train,
-    y_train,
-    validation_data=(X_val, y_val),
-    epochs=EPOCHS,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
-    callbacks=callbacks,
-)
-
-# ------------------- Export to TFLite -------------------
-os.makedirs("models", exist_ok=True)
 model.save("models/pillar_path_model.keras")
 
 # Using the concrete function approach for maximum TFLite stability
