@@ -160,13 +160,15 @@ if __name__ == "__main__":
     for label in labels:
         path = os.path.join(ROOT_DIR, label)
         videos = [f for f in os.listdir(path) if f.endswith(".mp4")]
-
-        # Track dominant shapes for this gesture
         all_h1_shapes, all_h2_shapes = [], []
 
-        for v in videos:
+        print(f"\n>>> PROCESSING LABEL: {label} ({len(videos)} videos)")
+
+        for idx, v in enumerate(videos):
+            print(f"  [{idx+1}/{len(videos)}] Analyzing Video: {v}", end="\r")
             cap = cv2.VideoCapture(os.path.join(path, v))
             raw_seq, shape_seq = [], []
+
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
@@ -176,24 +178,26 @@ if __name__ == "__main__":
                 shape_seq.append(shapes)
             cap.release()
 
-            if len(raw_seq) > 5:
+            if len(raw_seq) > 10:
                 X.append(resample_sequence(raw_seq, TARGET_FRAMES))
                 y.append(labels.index(label))
-                # Add shapes to the anatomy tracker
                 all_h1_shapes.extend([s[0] for s in shape_seq if s[0] != -1])
                 all_h2_shapes.extend([s[1] for s in shape_seq if s[1] != -1])
 
-        # Attribute dominant shapes to the label
+        # Calculate Anatomy for the label based on frequency
         dom_h1 = (
             max(set(all_h1_shapes), key=all_h1_shapes.count) if all_h1_shapes else -1
         )
         dom_h2 = (
             max(set(all_h2_shapes), key=all_h2_shapes.count) if all_h2_shapes else -1
         )
-        anatomy_data[label] = {"h1_shape": int(dom_h1), "h2_shape": int(dom_h2)}
+        anatomy_data[label] = {"h1_required": int(dom_h1), "h2_required": int(dom_h2)}
+        print(f"\n  Final Anatomy for {label}: H1={dom_h1}, H2={dom_h2}")
 
     np.save(f"{OUTPUT_DIR}/X.npy", np.array(X, dtype=np.float32))
     np.save(f"{OUTPUT_DIR}/y.npy", np.array(y))
     with open(f"{OUTPUT_DIR}/gesture_anatomy.json", "w") as f:
         json.dump(anatomy_data, f, indent=2)
-    print(f"Dataset Built. Feature Count: {len(X[0][0])}. Anatomy Mapped.")
+
+    print(f"\nSuccess! Built dataset with {len(X)} samples.")
+    print(f"Feature Vector Size: {FEATURE_COUNT}")
