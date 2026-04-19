@@ -1,0 +1,1262 @@
+{
+    "BOY": {
+        "nose": {
+            "mean": 1.0705,
+            "std": 0.7625,
+            "threshold_2sigma": 2.5956
+        },
+        "left_ear": {
+            "mean": 1.219,
+            "std": 0.8256,
+            "threshold_2sigma": 2.8703
+        },
+        "right_ear": {
+            "mean": 1.058,
+            "std": 0.8239,
+            "threshold_2sigma": 2.7057
+        },
+        "left_shoulder": {
+            "mean": 1.38,
+            "std": 0.3145,
+            "threshold_2sigma": 2.0091
+        },
+        "right_shoulder": {
+            "mean": 0.9892,
+            "std": 0.402,
+            "threshold_2sigma": 1.7932
+        },
+        "forehead": {
+            "mean": 1.1651,
+            "std": 0.9247,
+            "threshold_2sigma": 3.0145
+        },
+        "chin": {
+            "mean": 1.0382,
+            "std": 0.611,
+            "threshold_2sigma": 2.2602
+        },
+        "chest": {
+            "mean": 1.0914,
+            "std": 0.3615,
+            "threshold_2sigma": 1.8143
+        }
+    },
+    "COLD": {
+        "nose": {
+            "mean": 1.1244,
+            "std": 0.477,
+            "threshold_2sigma": 2.0784
+        },
+        "left_ear": {
+            "mean": 1.2491,
+            "std": 0.4845,
+            "threshold_2sigma": 2.2181
+        },
+        "right_ear": {
+            "mean": 1.222,
+            "std": 0.473,
+            "threshold_2sigma": 2.1681
+        },
+        "left_shoulder": {
+            "mean": 0.6235,
+            "std": 0.4436,
+            "threshold_2sigma": 1.5107
+        },
+        "right_shoulder": {
+            "mean": 0.6957,
+            "std": 0.4237,
+            "threshold_2sigma": 1.5431
+        },
+        "forehead": {
+            "mean": 1.388,
+            "std": 0.4892,
+            "threshold_2sigma": 2.3664
+        },
+        "chin": {
+            "mean": 0.9138,
+            "std": 0.4644,
+            "threshold_2sigma": 1.8427
+        },
+        "chest": {
+            "mean": 0.4996,
+            "std": 0.3535,
+            "threshold_2sigma": 1.2066
+        }
+    },
+    "CORRECT": {
+        "nose": {
+            "mean": 1.2431,
+            "std": 0.572,
+            "threshold_2sigma": 2.3872
+        },
+        "left_ear": {
+            "mean": 1.394,
+            "std": 0.6183,
+            "threshold_2sigma": 2.6306
+        },
+        "right_ear": {
+            "mean": 1.3076,
+            "std": 0.5853,
+            "threshold_2sigma": 2.4781
+        },
+        "left_shoulder": {
+            "mean": 0.9545,
+            "std": 0.4605,
+            "threshold_2sigma": 1.8756
+        },
+        "right_shoulder": {
+            "mean": 0.9209,
+            "std": 0.37,
+            "threshold_2sigma": 1.6609
+        },
+        "forehead": {
+            "mean": 1.4349,
+            "std": 0.6456,
+            "threshold_2sigma": 2.7262
+        },
+        "chin": {
+            "mean": 1.097,
+            "std": 0.5196,
+            "threshold_2sigma": 2.1362
+        },
+        "chest": {
+            "mean": 0.7532,
+            "std": 0.4866,
+            "threshold_2sigma": 1.7263
+        }
+    },
+    "DONT_KNOW": {
+        "nose": {
+            "mean": 0.6588,
+            "std": 0.4207,
+            "threshold_2sigma": 1.5003
+        },
+        "left_ear": {
+            "mean": 0.7607,
+            "std": 0.4558,
+            "threshold_2sigma": 1.6723
+        },
+        "right_ear": {
+            "mean": 0.5121,
+            "std": 0.4714,
+            "threshold_2sigma": 1.4549
+        },
+        "left_shoulder": {
+            "mean": 1.4584,
+            "std": 0.2627,
+            "threshold_2sigma": 1.9839
+        },
+        "right_shoulder": {
+            "mean": 1.0564,
+            "std": 0.3565,
+            "threshold_2sigma": 1.7694
+        },
+        "forehead": {
+            "mean": 0.6296,
+            "std": 0.5436,
+            "threshold_2sigma": 1.7167
+        },
+        "chin": {
+            "mean": 0.7439,
+            "std": 0.3362,
+            "threshold_2sigma": 1.4163
+        },
+        "chest": {
+            "mean": 1.169,
+            "std": 0.3209,
+            "threshold_2sigma": 1.8108
+        }
+    },
+    "DONT_UNDERSTAND": {
+        "nose": {
+            "mean": 1.0089,
+            "std": 0.6633,
+            "threshold_2sigma": 2.3355
+        },
+        "left_ear": {
+            "mean": 1.1404,
+            "std": 0.7189,
+            "threshold_2sigma": 2.5782
+        },
+        "right_ear": {
+            "mean": 0.9731,
+            "std": 0.7424,
+            "threshold_2sigma": 2.4579
+        },
+        "left_shoulder": {
+            "mean": 1.2978,
+            "std": 0.3212,
+            "threshold_2sigma": 1.9401
+        },
+        "right_shoulder": {
+            "mean": 0.9566,
+            "std": 0.3931,
+            "threshold_2sigma": 1.7428
+        },
+        "forehead": {
+            "mean": 1.0868,
+            "std": 0.8376,
+            "threshold_2sigma": 2.7621
+        },
+        "chin": {
+            "mean": 0.9776,
+            "std": 0.5165,
+            "threshold_2sigma": 2.0106
+        },
+        "chest": {
+            "mean": 1.014,
+            "std": 0.3878,
+            "threshold_2sigma": 1.7895
+        }
+    },
+    "FAST": {
+        "nose": {
+            "mean": 0.6728,
+            "std": 0.3563,
+            "threshold_2sigma": 1.3854
+        },
+        "left_ear": {
+            "mean": 0.865,
+            "std": 0.3796,
+            "threshold_2sigma": 1.6242
+        },
+        "right_ear": {
+            "mean": 0.5941,
+            "std": 0.4331,
+            "threshold_2sigma": 1.4603
+        },
+        "left_shoulder": {
+            "mean": 1.1021,
+            "std": 0.1985,
+            "threshold_2sigma": 1.4991
+        },
+        "right_shoulder": {
+            "mean": 0.5628,
+            "std": 0.3373,
+            "threshold_2sigma": 1.2373
+        },
+        "forehead": {
+            "mean": 0.8273,
+            "std": 0.4474,
+            "threshold_2sigma": 1.7221
+        },
+        "chin": {
+            "mean": 0.604,
+            "std": 0.2739,
+            "threshold_2sigma": 1.1519
+        },
+        "chest": {
+            "mean": 0.721,
+            "std": 0.2689,
+            "threshold_2sigma": 1.2589
+        }
+    },
+    "GIRL": {
+        "nose": {
+            "mean": 1.3229,
+            "std": 0.6353,
+            "threshold_2sigma": 2.5934
+        },
+        "left_ear": {
+            "mean": 1.5286,
+            "std": 0.631,
+            "threshold_2sigma": 2.7905
+        },
+        "right_ear": {
+            "mean": 1.3672,
+            "std": 0.6369,
+            "threshold_2sigma": 2.6411
+        },
+        "left_shoulder": {
+            "mean": 1.1215,
+            "std": 0.3748,
+            "threshold_2sigma": 1.8711
+        },
+        "right_shoulder": {
+            "mean": 0.629,
+            "std": 0.4021,
+            "threshold_2sigma": 1.4331
+        },
+        "forehead": {
+            "mean": 1.6059,
+            "std": 0.6299,
+            "threshold_2sigma": 2.8657
+        },
+        "chin": {
+            "mean": 1.0949,
+            "std": 0.6367,
+            "threshold_2sigma": 2.3682
+        },
+        "chest": {
+            "mean": 0.7327,
+            "std": 0.4368,
+            "threshold_2sigma": 1.6064
+        }
+    },
+    "GOOD_AFTERNOON": {
+        "nose": {
+            "mean": 0.769,
+            "std": 0.4417,
+            "threshold_2sigma": 1.6525
+        },
+        "left_ear": {
+            "mean": 0.9742,
+            "std": 0.4309,
+            "threshold_2sigma": 1.836
+        },
+        "right_ear": {
+            "mean": 0.8107,
+            "std": 0.4305,
+            "threshold_2sigma": 1.6717
+        },
+        "left_shoulder": {
+            "mean": 0.9785,
+            "std": 0.295,
+            "threshold_2sigma": 1.5686
+        },
+        "right_shoulder": {
+            "mean": 0.537,
+            "std": 0.3068,
+            "threshold_2sigma": 1.1506
+        },
+        "forehead": {
+            "mean": 1.018,
+            "std": 0.4644,
+            "threshold_2sigma": 1.9468
+        },
+        "chin": {
+            "mean": 0.6124,
+            "std": 0.3948,
+            "threshold_2sigma": 1.402
+        },
+        "chest": {
+            "mean": 0.6009,
+            "std": 0.32,
+            "threshold_2sigma": 1.2409
+        }
+    },
+    "GOOD_EVENING": {
+        "nose": {
+            "mean": 0.9277,
+            "std": 0.3808,
+            "threshold_2sigma": 1.6893
+        },
+        "left_ear": {
+            "mean": 1.1201,
+            "std": 0.3816,
+            "threshold_2sigma": 1.8832
+        },
+        "right_ear": {
+            "mean": 0.9923,
+            "std": 0.4008,
+            "threshold_2sigma": 1.7939
+        },
+        "left_shoulder": {
+            "mean": 0.8876,
+            "std": 0.3445,
+            "threshold_2sigma": 1.5765
+        },
+        "right_shoulder": {
+            "mean": 0.5282,
+            "std": 0.2838,
+            "threshold_2sigma": 1.0958
+        },
+        "forehead": {
+            "mean": 1.1745,
+            "std": 0.4151,
+            "threshold_2sigma": 2.0047
+        },
+        "chin": {
+            "mean": 0.7444,
+            "std": 0.3518,
+            "threshold_2sigma": 1.448
+        },
+        "chest": {
+            "mean": 0.5038,
+            "std": 0.3594,
+            "threshold_2sigma": 1.2226
+        }
+    },
+    "GOOD_MORNING": {
+        "nose": {
+            "mean": 0.8404,
+            "std": 0.394,
+            "threshold_2sigma": 1.6284
+        },
+        "left_ear": {
+            "mean": 1.0315,
+            "std": 0.4109,
+            "threshold_2sigma": 1.8533
+        },
+        "right_ear": {
+            "mean": 0.8257,
+            "std": 0.4319,
+            "threshold_2sigma": 1.6896
+        },
+        "left_shoulder": {
+            "mean": 1.1068,
+            "std": 0.364,
+            "threshold_2sigma": 1.8349
+        },
+        "right_shoulder": {
+            "mean": 0.6108,
+            "std": 0.3981,
+            "threshold_2sigma": 1.4069
+        },
+        "forehead": {
+            "mean": 1.0263,
+            "std": 0.4811,
+            "threshold_2sigma": 1.9886
+        },
+        "chin": {
+            "mean": 0.723,
+            "std": 0.3442,
+            "threshold_2sigma": 1.4113
+        },
+        "chest": {
+            "mean": 0.7169,
+            "std": 0.4251,
+            "threshold_2sigma": 1.567
+        }
+    },
+    "HELLO": {
+        "nose": {
+            "mean": 0.5598,
+            "std": 0.3601,
+            "threshold_2sigma": 1.28
+        },
+        "left_ear": {
+            "mean": 0.6333,
+            "std": 0.3983,
+            "threshold_2sigma": 1.4298
+        },
+        "right_ear": {
+            "mean": 0.4255,
+            "std": 0.4138,
+            "threshold_2sigma": 1.253
+        },
+        "left_shoulder": {
+            "mean": 1.3446,
+            "std": 0.2348,
+            "threshold_2sigma": 1.8143
+        },
+        "right_shoulder": {
+            "mean": 0.9958,
+            "std": 0.3507,
+            "threshold_2sigma": 1.6971
+        },
+        "forehead": {
+            "mean": 0.5246,
+            "std": 0.4714,
+            "threshold_2sigma": 1.4675
+        },
+        "chin": {
+            "mean": 0.6495,
+            "std": 0.296,
+            "threshold_2sigma": 1.2416
+        },
+        "chest": {
+            "mean": 1.0697,
+            "std": 0.3075,
+            "threshold_2sigma": 1.6848
+        }
+    },
+    "HOT": {
+        "nose": {
+            "mean": 0.844,
+            "std": 0.7561,
+            "threshold_2sigma": 2.3562
+        },
+        "left_ear": {
+            "mean": 1.0306,
+            "std": 0.7239,
+            "threshold_2sigma": 2.4785
+        },
+        "right_ear": {
+            "mean": 0.9436,
+            "std": 0.7393,
+            "threshold_2sigma": 2.4222
+        },
+        "left_shoulder": {
+            "mean": 0.9095,
+            "std": 0.3491,
+            "threshold_2sigma": 1.6077
+        },
+        "right_shoulder": {
+            "mean": 0.7592,
+            "std": 0.3916,
+            "threshold_2sigma": 1.5423
+        },
+        "forehead": {
+            "mean": 1.1392,
+            "std": 0.7647,
+            "threshold_2sigma": 2.6686
+        },
+        "chin": {
+            "mean": 0.679,
+            "std": 0.6809,
+            "threshold_2sigma": 2.0409
+        },
+        "chest": {
+            "mean": 0.641,
+            "std": 0.4225,
+            "threshold_2sigma": 1.486
+        }
+    },
+    "HOW_ARE_YOU": {
+        "nose": {
+            "mean": 1.2125,
+            "std": 0.4706,
+            "threshold_2sigma": 2.1537
+        },
+        "left_ear": {
+            "mean": 1.4194,
+            "std": 0.4525,
+            "threshold_2sigma": 2.3245
+        },
+        "right_ear": {
+            "mean": 1.3194,
+            "std": 0.4546,
+            "threshold_2sigma": 2.2286
+        },
+        "left_shoulder": {
+            "mean": 0.7375,
+            "std": 0.2865,
+            "threshold_2sigma": 1.3105
+        },
+        "right_shoulder": {
+            "mean": 0.7123,
+            "std": 0.2905,
+            "threshold_2sigma": 1.2932
+        },
+        "forehead": {
+            "mean": 1.4636,
+            "std": 0.4784,
+            "threshold_2sigma": 2.4203
+        },
+        "chin": {
+            "mean": 1.0044,
+            "std": 0.4647,
+            "threshold_2sigma": 1.9338
+        },
+        "chest": {
+            "mean": 0.4829,
+            "std": 0.3545,
+            "threshold_2sigma": 1.1919
+        }
+    },
+    "IM_FINE": {
+        "nose": {
+            "mean": 0.941,
+            "std": 0.3987,
+            "threshold_2sigma": 1.7383
+        },
+        "left_ear": {
+            "mean": 1.1207,
+            "std": 0.3863,
+            "threshold_2sigma": 1.8933
+        },
+        "right_ear": {
+            "mean": 1.0338,
+            "std": 0.3837,
+            "threshold_2sigma": 1.8012
+        },
+        "left_shoulder": {
+            "mean": 0.638,
+            "std": 0.2355,
+            "threshold_2sigma": 1.109
+        },
+        "right_shoulder": {
+            "mean": 0.5239,
+            "std": 0.1984,
+            "threshold_2sigma": 0.9206
+        },
+        "forehead": {
+            "mean": 1.2096,
+            "std": 0.4169,
+            "threshold_2sigma": 2.0434
+        },
+        "chin": {
+            "mean": 0.7189,
+            "std": 0.3842,
+            "threshold_2sigma": 1.4873
+        },
+        "chest": {
+            "mean": 0.2422,
+            "std": 0.2819,
+            "threshold_2sigma": 0.806
+        }
+    },
+    "KNOW": {
+        "nose": {
+            "mean": 0.6704,
+            "std": 0.3311,
+            "threshold_2sigma": 1.3325
+        },
+        "left_ear": {
+            "mean": 0.7092,
+            "std": 0.352,
+            "threshold_2sigma": 1.4131
+        },
+        "right_ear": {
+            "mean": 0.5033,
+            "std": 0.3681,
+            "threshold_2sigma": 1.2395
+        },
+        "left_shoulder": {
+            "mean": 1.591,
+            "std": 0.3079,
+            "threshold_2sigma": 2.2068
+        },
+        "right_shoulder": {
+            "mean": 1.2554,
+            "std": 0.321,
+            "threshold_2sigma": 1.8974
+        },
+        "forehead": {
+            "mean": 0.5538,
+            "std": 0.414,
+            "threshold_2sigma": 1.3818
+        },
+        "chin": {
+            "mean": 0.8114,
+            "std": 0.2946,
+            "threshold_2sigma": 1.4007
+        },
+        "chest": {
+            "mean": 1.3402,
+            "std": 0.3261,
+            "threshold_2sigma": 1.9925
+        }
+    },
+    "MAN": {
+        "nose": {
+            "mean": 0.675,
+            "std": 0.4978,
+            "threshold_2sigma": 1.6706
+        },
+        "left_ear": {
+            "mean": 0.751,
+            "std": 0.4934,
+            "threshold_2sigma": 1.7379
+        },
+        "right_ear": {
+            "mean": 0.5694,
+            "std": 0.5103,
+            "threshold_2sigma": 1.59
+        },
+        "left_shoulder": {
+            "mean": 1.6141,
+            "std": 0.4086,
+            "threshold_2sigma": 2.4313
+        },
+        "right_shoulder": {
+            "mean": 1.2495,
+            "std": 0.4064,
+            "threshold_2sigma": 2.0623
+        },
+        "forehead": {
+            "mean": 0.5813,
+            "std": 0.5449,
+            "threshold_2sigma": 1.6711
+        },
+        "chin": {
+            "mean": 0.8199,
+            "std": 0.4653,
+            "threshold_2sigma": 1.7505
+        },
+        "chest": {
+            "mean": 1.3464,
+            "std": 0.432,
+            "threshold_2sigma": 2.2104
+        }
+    },
+    "NICE_TO_MEET_YOU": {
+        "nose": {
+            "mean": 0.8227,
+            "std": 0.5522,
+            "threshold_2sigma": 1.9272
+        },
+        "left_ear": {
+            "mean": 0.9979,
+            "std": 0.5539,
+            "threshold_2sigma": 2.1057
+        },
+        "right_ear": {
+            "mean": 0.9382,
+            "std": 0.5616,
+            "threshold_2sigma": 2.0614
+        },
+        "left_shoulder": {
+            "mean": 0.738,
+            "std": 0.3266,
+            "threshold_2sigma": 1.3911
+        },
+        "right_shoulder": {
+            "mean": 0.7618,
+            "std": 0.2493,
+            "threshold_2sigma": 1.2604
+        },
+        "forehead": {
+            "mean": 1.0496,
+            "std": 0.5908,
+            "threshold_2sigma": 2.2312
+        },
+        "chin": {
+            "mean": 0.6751,
+            "std": 0.4907,
+            "threshold_2sigma": 1.6565
+        },
+        "chest": {
+            "mean": 0.5494,
+            "std": 0.3084,
+            "threshold_2sigma": 1.1662
+        }
+    },
+    "NO": {
+        "nose": {
+            "mean": 0.7827,
+            "std": 0.4445,
+            "threshold_2sigma": 1.6718
+        },
+        "left_ear": {
+            "mean": 0.984,
+            "std": 0.4522,
+            "threshold_2sigma": 1.8883
+        },
+        "right_ear": {
+            "mean": 0.7898,
+            "std": 0.4731,
+            "threshold_2sigma": 1.736
+        },
+        "left_shoulder": {
+            "mean": 1.0232,
+            "std": 0.2565,
+            "threshold_2sigma": 1.5362
+        },
+        "right_shoulder": {
+            "mean": 0.5132,
+            "std": 0.3546,
+            "threshold_2sigma": 1.2224
+        },
+        "forehead": {
+            "mean": 0.9878,
+            "std": 0.5123,
+            "threshold_2sigma": 2.0125
+        },
+        "chin": {
+            "mean": 0.6447,
+            "std": 0.397,
+            "threshold_2sigma": 1.4387
+        },
+        "chest": {
+            "mean": 0.6331,
+            "std": 0.3163,
+            "threshold_2sigma": 1.2657
+        }
+    },
+    "PARENTS": {
+        "nose": {
+            "mean": 0.6175,
+            "std": 0.4611,
+            "threshold_2sigma": 1.5397
+        },
+        "left_ear": {
+            "mean": 0.6965,
+            "std": 0.408,
+            "threshold_2sigma": 1.5125
+        },
+        "right_ear": {
+            "mean": 0.5682,
+            "std": 0.4294,
+            "threshold_2sigma": 1.4271
+        },
+        "left_shoulder": {
+            "mean": 1.4624,
+            "std": 0.4988,
+            "threshold_2sigma": 2.46
+        },
+        "right_shoulder": {
+            "mean": 1.2323,
+            "std": 0.4516,
+            "threshold_2sigma": 2.1356
+        },
+        "forehead": {
+            "mean": 0.6083,
+            "std": 0.4268,
+            "threshold_2sigma": 1.4619
+        },
+        "chin": {
+            "mean": 0.71,
+            "std": 0.4925,
+            "threshold_2sigma": 1.695
+        },
+        "chest": {
+            "mean": 1.2408,
+            "std": 0.5152,
+            "threshold_2sigma": 2.2712
+        }
+    },
+    "SEE_YOU_TOMORROW": {
+        "nose": {
+            "mean": 0.6841,
+            "std": 0.4411,
+            "threshold_2sigma": 1.5664
+        },
+        "left_ear": {
+            "mean": 0.9127,
+            "std": 0.4307,
+            "threshold_2sigma": 1.774
+        },
+        "right_ear": {
+            "mean": 0.7425,
+            "std": 0.4658,
+            "threshold_2sigma": 1.6741
+        },
+        "left_shoulder": {
+            "mean": 0.8766,
+            "std": 0.2152,
+            "threshold_2sigma": 1.307
+        },
+        "right_shoulder": {
+            "mean": 0.5683,
+            "std": 0.2623,
+            "threshold_2sigma": 1.0929
+        },
+        "forehead": {
+            "mean": 0.9156,
+            "std": 0.4705,
+            "threshold_2sigma": 1.8565
+        },
+        "chin": {
+            "mean": 0.5448,
+            "std": 0.3779,
+            "threshold_2sigma": 1.3005
+        },
+        "chest": {
+            "mean": 0.5238,
+            "std": 0.281,
+            "threshold_2sigma": 1.0858
+        }
+    },
+    "SLOW": {
+        "nose": {
+            "mean": 1.7071,
+            "std": 0.5332,
+            "threshold_2sigma": 2.7735
+        },
+        "left_ear": {
+            "mean": 1.8613,
+            "std": 0.5873,
+            "threshold_2sigma": 3.0359
+        },
+        "right_ear": {
+            "mean": 1.8248,
+            "std": 0.5139,
+            "threshold_2sigma": 2.8525
+        },
+        "left_shoulder": {
+            "mean": 1.0823,
+            "std": 0.3828,
+            "threshold_2sigma": 1.8478
+        },
+        "right_shoulder": {
+            "mean": 1.1894,
+            "std": 0.3238,
+            "threshold_2sigma": 1.8369
+        },
+        "forehead": {
+            "mean": 1.9253,
+            "std": 0.5916,
+            "threshold_2sigma": 3.1086
+        },
+        "chin": {
+            "mean": 1.5305,
+            "std": 0.4826,
+            "threshold_2sigma": 2.4958
+        },
+        "chest": {
+            "mean": 1.0071,
+            "std": 0.393,
+            "threshold_2sigma": 1.793
+        }
+    },
+    "THANK_YOU": {
+        "nose": {
+            "mean": 0.751,
+            "std": 0.4792,
+            "threshold_2sigma": 1.7094
+        },
+        "left_ear": {
+            "mean": 0.8975,
+            "std": 0.4927,
+            "threshold_2sigma": 1.8828
+        },
+        "right_ear": {
+            "mean": 0.8664,
+            "std": 0.4872,
+            "threshold_2sigma": 1.8407
+        },
+        "left_shoulder": {
+            "mean": 0.7496,
+            "std": 0.2951,
+            "threshold_2sigma": 1.3398
+        },
+        "right_shoulder": {
+            "mean": 0.7358,
+            "std": 0.3231,
+            "threshold_2sigma": 1.382
+        },
+        "forehead": {
+            "mean": 0.9811,
+            "std": 0.499,
+            "threshold_2sigma": 1.9791
+        },
+        "chin": {
+            "mean": 0.6027,
+            "std": 0.4345,
+            "threshold_2sigma": 1.4717
+        },
+        "chest": {
+            "mean": 0.5961,
+            "std": 0.2051,
+            "threshold_2sigma": 1.0063
+        }
+    },
+    "TODAY": {
+        "nose": {
+            "mean": 1.9222,
+            "std": 0.4004,
+            "threshold_2sigma": 2.7231
+        },
+        "left_ear": {
+            "mean": 2.0527,
+            "std": 0.4202,
+            "threshold_2sigma": 2.8932
+        },
+        "right_ear": {
+            "mean": 2.0207,
+            "std": 0.4022,
+            "threshold_2sigma": 2.8251
+        },
+        "left_shoulder": {
+            "mean": 1.1618,
+            "std": 0.3967,
+            "threshold_2sigma": 1.9553
+        },
+        "right_shoulder": {
+            "mean": 1.2034,
+            "std": 0.3749,
+            "threshold_2sigma": 1.9533
+        },
+        "forehead": {
+            "mean": 2.1858,
+            "std": 0.432,
+            "threshold_2sigma": 3.0498
+        },
+        "chin": {
+            "mean": 1.7081,
+            "std": 0.3702,
+            "threshold_2sigma": 2.4485
+        },
+        "chest": {
+            "mean": 1.1133,
+            "std": 0.2421,
+            "threshold_2sigma": 1.5975
+        }
+    },
+    "TOMORROW": {
+        "nose": {
+            "mean": 0.8776,
+            "std": 0.4035,
+            "threshold_2sigma": 1.6845
+        },
+        "left_ear": {
+            "mean": 1.0948,
+            "std": 0.3807,
+            "threshold_2sigma": 1.8563
+        },
+        "right_ear": {
+            "mean": 0.9192,
+            "std": 0.4109,
+            "threshold_2sigma": 1.741
+        },
+        "left_shoulder": {
+            "mean": 0.929,
+            "std": 0.1623,
+            "threshold_2sigma": 1.2537
+        },
+        "right_shoulder": {
+            "mean": 0.3583,
+            "std": 0.2408,
+            "threshold_2sigma": 0.8399
+        },
+        "forehead": {
+            "mean": 1.1566,
+            "std": 0.4178,
+            "threshold_2sigma": 1.9921
+        },
+        "chin": {
+            "mean": 0.6652,
+            "std": 0.3773,
+            "threshold_2sigma": 1.4197
+        },
+        "chest": {
+            "mean": 0.4925,
+            "std": 0.213,
+            "threshold_2sigma": 0.9185
+        }
+    },
+    "UNDERSTAND": {
+        "nose": {
+            "mean": 0.7148,
+            "std": 0.4203,
+            "threshold_2sigma": 1.5554
+        },
+        "left_ear": {
+            "mean": 0.8172,
+            "std": 0.4197,
+            "threshold_2sigma": 1.6566
+        },
+        "right_ear": {
+            "mean": 0.5753,
+            "std": 0.4656,
+            "threshold_2sigma": 1.5066
+        },
+        "left_shoulder": {
+            "mean": 1.4915,
+            "std": 0.3771,
+            "threshold_2sigma": 2.2456
+        },
+        "right_shoulder": {
+            "mean": 1.0899,
+            "std": 0.4461,
+            "threshold_2sigma": 1.982
+        },
+        "forehead": {
+            "mean": 0.695,
+            "std": 0.4965,
+            "threshold_2sigma": 1.688
+        },
+        "chin": {
+            "mean": 0.787,
+            "std": 0.3827,
+            "threshold_2sigma": 1.5523
+        },
+        "chest": {
+            "mean": 1.201,
+            "std": 0.4294,
+            "threshold_2sigma": 2.0597
+        }
+    },
+    "WOMAN": {
+        "nose": {
+            "mean": 0.7213,
+            "std": 0.3883,
+            "threshold_2sigma": 1.4979
+        },
+        "left_ear": {
+            "mean": 0.8796,
+            "std": 0.3944,
+            "threshold_2sigma": 1.6684
+        },
+        "right_ear": {
+            "mean": 0.6552,
+            "std": 0.4391,
+            "threshold_2sigma": 1.5333
+        },
+        "left_shoulder": {
+            "mean": 1.2586,
+            "std": 0.3845,
+            "threshold_2sigma": 2.0275
+        },
+        "right_shoulder": {
+            "mean": 0.7916,
+            "std": 0.4569,
+            "threshold_2sigma": 1.7053
+        },
+        "forehead": {
+            "mean": 0.8339,
+            "std": 0.4953,
+            "threshold_2sigma": 1.8245
+        },
+        "chin": {
+            "mean": 0.6751,
+            "std": 0.3593,
+            "threshold_2sigma": 1.3937
+        },
+        "chest": {
+            "mean": 0.9042,
+            "std": 0.4647,
+            "threshold_2sigma": 1.8336
+        }
+    },
+    "WRONG": {
+        "nose": {
+            "mean": 0.7554,
+            "std": 0.3658,
+            "threshold_2sigma": 1.4871
+        },
+        "left_ear": {
+            "mean": 0.9371,
+            "std": 0.3459,
+            "threshold_2sigma": 1.6289
+        },
+        "right_ear": {
+            "mean": 0.8584,
+            "std": 0.3576,
+            "threshold_2sigma": 1.5735
+        },
+        "left_shoulder": {
+            "mean": 0.736,
+            "std": 0.1322,
+            "threshold_2sigma": 1.0003
+        },
+        "right_shoulder": {
+            "mean": 0.5043,
+            "std": 0.1386,
+            "threshold_2sigma": 0.7814
+        },
+        "forehead": {
+            "mean": 1.0217,
+            "std": 0.3796,
+            "threshold_2sigma": 1.7809
+        },
+        "chin": {
+            "mean": 0.5371,
+            "std": 0.3538,
+            "threshold_2sigma": 1.2446
+        },
+        "chest": {
+            "mean": 0.3701,
+            "std": 0.1712,
+            "threshold_2sigma": 0.7126
+        }
+    },
+    "YES": {
+        "nose": {
+            "mean": 1.0333,
+            "std": 0.4575,
+            "threshold_2sigma": 1.9482
+        },
+        "left_ear": {
+            "mean": 1.2397,
+            "std": 0.4444,
+            "threshold_2sigma": 2.1285
+        },
+        "right_ear": {
+            "mean": 1.0374,
+            "std": 0.4833,
+            "threshold_2sigma": 2.004
+        },
+        "left_shoulder": {
+            "mean": 1.0004,
+            "std": 0.1934,
+            "threshold_2sigma": 1.3872
+        },
+        "right_shoulder": {
+            "mean": 0.3679,
+            "std": 0.2901,
+            "threshold_2sigma": 0.9481
+        },
+        "forehead": {
+            "mean": 1.2816,
+            "std": 0.4911,
+            "threshold_2sigma": 2.2637
+        },
+        "chin": {
+            "mean": 0.8487,
+            "std": 0.4146,
+            "threshold_2sigma": 1.678
+        },
+        "chest": {
+            "mean": 0.5616,
+            "std": 0.2519,
+            "threshold_2sigma": 1.0653
+        }
+    },
+    "YESTERDAY": {
+        "nose": {
+            "mean": 0.9669,
+            "std": 0.4297,
+            "threshold_2sigma": 1.8262
+        },
+        "left_ear": {
+            "mean": 1.1808,
+            "std": 0.4127,
+            "threshold_2sigma": 2.0062
+        },
+        "right_ear": {
+            "mean": 0.9258,
+            "std": 0.4452,
+            "threshold_2sigma": 1.8161
+        },
+        "left_shoulder": {
+            "mean": 1.1609,
+            "std": 0.1701,
+            "threshold_2sigma": 1.5011
+        },
+        "right_shoulder": {
+            "mean": 0.4072,
+            "std": 0.2809,
+            "threshold_2sigma": 0.969
+        },
+        "forehead": {
+            "mean": 1.2246,
+            "std": 0.4452,
+            "threshold_2sigma": 2.1149
+        },
+        "chin": {
+            "mean": 0.7908,
+            "std": 0.3957,
+            "threshold_2sigma": 1.5821
+        },
+        "chest": {
+            "mean": 0.7198,
+            "std": 0.2066,
+            "threshold_2sigma": 1.1329
+        }
+    },
+    "YOURE_WELCOME": {
+        "nose": {
+            "mean": 1.2774,
+            "std": 0.7281,
+            "threshold_2sigma": 2.7335
+        },
+        "left_ear": {
+            "mean": 1.464,
+            "std": 0.7323,
+            "threshold_2sigma": 2.9286
+        },
+        "right_ear": {
+            "mean": 1.3626,
+            "std": 0.758,
+            "threshold_2sigma": 2.8785
+        },
+        "left_shoulder": {
+            "mean": 0.9982,
+            "std": 0.2652,
+            "threshold_2sigma": 1.5286
+        },
+        "right_shoulder": {
+            "mean": 0.9615,
+            "std": 0.3599,
+            "threshold_2sigma": 1.6813
+        },
+        "forehead": {
+            "mean": 1.5383,
+            "std": 0.7312,
+            "threshold_2sigma": 3.0006
+        },
+        "chin": {
+            "mean": 1.0853,
+            "std": 0.6955,
+            "threshold_2sigma": 2.4764
+        },
+        "chest": {
+            "mean": 0.8226,
+            "std": 0.3657,
+            "threshold_2sigma": 1.5539
+        }
+    }
+}
