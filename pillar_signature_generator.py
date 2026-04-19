@@ -8,9 +8,9 @@ from mediapipe.tasks.python import vision
 # --- CONFIGURATION ---
 ROOT_DIR = "common_clips"
 OUTPUT_DIR = "data"
-MODEL_PATH = "models/pose_landmarker_full.task"
+POSE_MODEL = "models/pose_landmarker_full.task"
+HAND_MODEL = "models/hand_landmarker.task"
 
-# Derived Pillars
 PILLAR_LABELS = [
     "nose",
     "left_ear",
@@ -23,68 +23,78 @@ PILLAR_LABELS = [
 ]
 
 
-def create_landmarker():
+def create_models():
+    """Initializes Pose and Hand landmarkers with GPU acceleration."""
     BaseOptions = mp.tasks.BaseOptions
-    # GPU Acceleration for fast processing (Match old video_collector style)
     gpu = BaseOptions.Delegate.GPU
 
-    options = vision.PoseLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=MODEL_PATH, delegate=gpu),
+    p_opt = vision.PoseLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=POSE_MODEL, delegate=gpu),
         running_mode=vision.RunningMode.IMAGE,
     )
-    return vision.PoseLandmarker.create_from_options(options)
+    h_opt = vision.HandLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=HAND_MODEL, delegate=gpu),
+        running_mode=vision.RunningMode.IMAGE,
+        num_hands=1,  # Track dominant hand
+    )
+    return (
+        vision.PoseLandmarker.create_from_options(p_opt),
+        vision.HandLandmarker.create_from_options(h_opt),
+    )
 
 
-def extract_frame_data(frame, pose_landmarker):
-    mp_image = mp.Image(
+def extract_normalized_data(frame, p_landmarker, h_landmarker):
+    """Extracts fingertip and pillars, normalized by shoulder-to-shoulder width."""
+    mp_img = mp.Image(
         image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     )
-    result = pose_landmarker.detect(mp_image)
-    if not result.pose_landmarks:
+
+    p_res = p_landmarker.detect(mp_img)
+    h_res = h_landmarker.detect(mp_img)
+
+    # We need both body and hand to create a valid signature
+    if not p_res.pose_landmarks or not h_res.hand_landmarks:
         return None
 
-    lms = result.pose_landmarks[0]
-    nose, l_ear, r_ear, l_shl, r_shl = lms[0], lms[7], lms[8], lms[11], lms[12]
-    r_wrist, l_wrist = lms[16], lms[15]
+    p_lms = p_res.pose_landmarks[0]
+    h_lms = h_res.hand_landmarks[0]
 
-    # --- BODY SCALING (THE FIX) ---
-    # We use shoulder width as our "Unit of Measurement"
-    # This stays consistent regardless of distance to camera.
-    shoulder_width = np.sqrt((l_shl.x - r_shl.x) ** 2 + (l_shl.y - r_shl.y) ** 2)
-    scale = max(shoulder_width, 0.1)  # Safety floor
+    # 1. SCALE: Shoulder-to-Shoulder distance (The stable "Unit" of 1.0)
+    l_shl, r_shl = p_lms[11], p_lms[12]
+    shoulder_dist = np.sqrt((l_shl.x - r_shl.x) ** 2 + (l_shl.y - r_shl.y) ** 2)
+    scale = max(shoulder_dist, 0.05)
 
+    # 2. TARGET: Index Finger Tip (Landmark 8)
+    tip = h_lms[8]
+
+    # 3. PILLARS (Exactly matching debug_video_anatomy logic)
+    nose = p_lms[0]
     head_size = abs(l_shl.y - nose.y)
     pillars = {
         "nose": (nose.x, nose.y),
-        "left_ear": (l_ear.x, l_ear.y),
-        "right_ear": (r_ear.x, r_ear.y),
+        "left_ear": (p_lms[7].x, p_lms[7].y),
+        "right_ear": (p_lms[8].x, p_lms[8].y),
         "left_shoulder": (l_shl.x, l_shl.y),
         "right_shoulder": (r_shl.x, r_shl.y),
-        "forehead": (nose.x, nose.y - (head_size * 0.25)),
-        "chin": (nose.x, nose.y + (head_size * 0.2)),
+        "forehead": (nose.x, nose.y - (head_size * 0.3)),
+        "chin": (nose.x, nose.y + (head_size * 0.25)),
         "chest": ((l_shl.x + r_shl.x) / 2, (l_shl.y + r_shl.y) / 2),
     }
 
-    hand = (
-        (r_wrist.x, r_wrist.y)
-        if r_wrist.visibility > l_wrist.visibility
-        else (l_wrist.x, l_wrist.y)
-    )
-
-    return {"pillars": pillars, "hand": hand, "scale": scale}
+    return {"pillars": pillars, "tip": (tip.x, tip.y), "scale": scale}
 
 
 def generate_signatures():
-    landmarker = create_landmarker()
+    p_landmarker, h_landmarker = create_models()
     gesture_stats = {}
 
-    # ALPHABETICAL ORDER: Ensure labels are processed A-Z
+    # Sort labels A-Z
     labels = sorted(
         [d for d in os.listdir(ROOT_DIR) if os.path.isdir(os.path.join(ROOT_DIR, d))]
     )
 
     for label in labels:
-        print(f"Processing Gesture: {label}...")
+        print(f"Analyzing Gesture: {label}...")
         all_distances = {p: [] for p in PILLAR_LABELS}
         path = os.path.join(ROOT_DIR, label)
         videos = sorted(
@@ -98,30 +108,28 @@ def generate_signatures():
                 if not ret:
                     break
 
-                data = extract_frame_data(frame, landmarker)
+                data = extract_normalized_data(frame, p_landmarker, h_landmarker)
                 if data:
-                    h = data["hand"]
+                    tip = data["tip"]
                     for p_name in PILLAR_LABELS:
                         p = data["pillars"][p_name]
-                        # Euclidean distance calculation
-                        dist = (
-                            np.sqrt((h[0] - p[0]) ** 2 + (h[1] - p[1]) ** 2)
-                            / data["scale"]
-                        )
-                        all_distances[p_name].append(dist)
+                        # Calculate Euclidean distance and DIVIDE by scale
+                        raw_dist = np.sqrt((tip[0] - p[0]) ** 2 + (tip[1] - p[1]) ** 2)
+                        norm_dist = raw_dist / data["scale"]
+                        all_distances[p_name].append(norm_dist)
             cap.release()
 
-        # Build Statistical Signature using the 2-Sigma Rule
+        # Generate Signature (Mean + Standard Deviation)
         signature = {}
         for p_name in PILLAR_LABELS:
             dists = all_distances[p_name]
             if dists:
-                mean_val = np.mean(dists)
-                std_val = np.std(dists)
+                m = np.mean(dists)
+                s = np.std(dists)
                 signature[p_name] = {
-                    "mean": round(float(mean_val), 4),
-                    "std": round(float(std_val), 4),
-                    "threshold_2sigma": round(float(mean_val + (std_val * 2)), 4),
+                    "mean": round(float(m), 4),
+                    "std": round(float(s), 4),
+                    "threshold_2sigma": round(float(m + (s * 2)), 4),
                 }
 
         gesture_stats[label] = signature
@@ -129,11 +137,12 @@ def generate_signatures():
     # Export to JSON
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
-    output_path = os.path.join(OUTPUT_DIR, "pillar_signatures.json")
-    with open(output_path, "w") as f:
+    with open(os.path.join(OUTPUT_DIR, "pillar_signatures.json"), "w") as f:
         json.dump(gesture_stats, f, indent=4)
 
-    print(f"\nSuccess! Alphabetical signatures saved to {output_path}")
+    print(
+        f"\nProcessing Complete. Signatures saved to {OUTPUT_DIR}/pillar_signatures.json"
+    )
 
 
 if __name__ == "__main__":
