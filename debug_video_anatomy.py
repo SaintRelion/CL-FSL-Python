@@ -8,23 +8,42 @@ from mediapipe.tasks.python import vision
 # --- CONFIGURATION ---
 SIGNATURES_PATH = "data/pillar_signatures.json"
 POSE_TASK = "models/pose_landmarker_full.task"
+HAND_TASK = "models/hand_landmarker.task"
 ROOT_DIR = "common_clips"
 
 with open(SIGNATURES_PATH, "r") as f:
     GESTURE_SIGS = json.load(f)
 
+PILLAR_LABELS = [
+    "nose",
+    "left_ear",
+    "right_ear",
+    "left_shoulder",
+    "right_shoulder",
+    "forehead",
+    "chin",
+    "chest",
+]
 
-def create_landmarker():
+
+def create_models():
     BaseOptions = mp.tasks.BaseOptions
-    return vision.PoseLandmarker.create_from_options(
-        vision.PoseLandmarkerOptions(
-            base_options=BaseOptions(model_asset_path=POSE_TASK),
-            running_mode=vision.RunningMode.IMAGE,
-        )
+    p_opt = vision.PoseLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=POSE_TASK),
+        running_mode=vision.RunningMode.IMAGE,
     )
+    h_opt = vision.HandLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=HAND_TASK),
+        running_mode=vision.RunningMode.IMAGE,
+        num_hands=1,
+    )
+    return vision.PoseLandmarker.create_from_options(
+        p_opt
+    ), vision.HandLandmarker.create_from_options(h_opt)
 
 
-landmarker = create_landmarker()
+# Initialize
+p_landmarker, h_landmarker = create_models()
 all_labels = sorted(GESTURE_SIGS.keys())
 
 while True:
@@ -47,36 +66,41 @@ while True:
                     image_format=mp.ImageFormat.SRGB,
                     data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),
                 )
-                result = landmarker.detect(mp_image)
+                p_result = p_landmarker.detect(mp_image)
+                h_result = h_landmarker.detect(mp_image)
 
-                if result.pose_landmarks:
-                    lms = result.pose_landmarks[0]
+                if p_result.pose_landmarks and h_result.hand_landmarks:
+                    p_lms = p_result.pose_landmarks[0]
+                    h_lms = h_result.hand_landmarks[0]
 
-                    # --- REFINED SCALING ---
-                    # Use the vertical distance from Nose(0) to Mid-Shoulder as the unit
-                    mid_shoulder_y = (lms[11].y + lms[12].y) / 2
-                    scale = max(abs(mid_shoulder_y - lms[0].y), 0.05)
+                    # 1. DYNAMIC SCALE (Shoulder to Shoulder)
+                    scale = np.sqrt(
+                        (p_lms[11].x - p_lms[12].x) ** 2
+                        + (p_lms[11].y - p_lms[12].y) ** 2
+                    )
+                    scale = max(scale, 0.05)
 
-                    head_size = scale  # Use this for derived pillars
+                    # 2. TARGET POINT (Index Finger Tip - Landmark 8)
+                    tip = (h_lms[8].x, h_lms[8].y)
+
+                    # 3. LIVE PILLARS
+                    nose = p_lms[0]
+                    head_size = abs(p_lms[11].y - nose.y)
                     live_pillars = {
-                        "nose": (lms[0].x, lms[0].y),
-                        "left_ear": (lms[7].x, lms[7].y),
-                        "right_ear": (lms[8].x, lms[8].y),
-                        "left_shoulder": (lms[11].x, lms[11].y),
-                        "right_shoulder": (lms[12].x, lms[12].y),
-                        "forehead": (
-                            lms[0].x,
-                            lms[0].y - (head_size * 0.8),
-                        ),  # Adjusted
-                        "chin": (lms[0].x, lms[0].y + (head_size * 0.4)),
+                        "nose": (nose.x, nose.y),
+                        "left_ear": (p_lms[7].x, p_lms[7].y),
+                        "right_ear": (p_lms[8].x, p_lms[8].y),
+                        "left_shoulder": (p_lms[11].x, p_lms[11].y),
+                        "right_shoulder": (p_lms[12].x, p_lms[12].y),
+                        "forehead": (nose.x, nose.y - (head_size * 0.3)),
+                        "chin": (nose.x, nose.y + (head_size * 0.25)),
                         "chest": (
-                            (lms[11].x + lms[12].x) / 2,
-                            (lms[11].y + lms[12].y) / 2,
+                            (p_lms[11].x + p_lms[12].x) / 2,
+                            (p_lms[11].y + p_lms[12].y) / 2,
                         ),
                     }
-                    hand = (lms[16].x, lms[16].y)  # Right wrist
 
-                    # --- GRID UI ---
+                    # --- GRID UI (4 COLUMNS) ---
                     cols = 4
                     rows_per_col = (len(all_labels) + cols - 1) // cols
                     col_w = w // cols
@@ -89,38 +113,38 @@ while True:
                         best_alpha = 0.0
 
                         for p_name, stats in sig_data.items():
-                            if p_name not in live_pillars:
-                                continue
                             p_pos = live_pillars[p_name]
 
                             # Normalized Distance
                             raw_dist = np.sqrt(
-                                (hand[0] - p_pos[0]) ** 2 + (hand[1] - p_pos[1]) ** 2
+                                (tip[0] - p_pos[0]) ** 2 + (tip[1] - p_pos[1]) ** 2
                             )
                             dist = raw_dist / scale
 
-                            # Z-score clipping: If std is too high, it makes everything light up.
-                            # We cap the impact of high variance.
-                            std = max(stats["std"], 0.01)
-                            z = (dist - stats["mean"]) / std
+                            # Calculate Z-score
+                            # We add a small 'stiffness' constant to the denominator to make it even stricter
+                            stiffness = 0.8
+                            z = (dist - stats["mean"]) / (stats["std"] * stiffness)
 
-                            # ALPHA CALCULATION
-                            # If hand is exactly at mean, alpha = 1.0.
-                            # If hand is 2 standard deviations away, alpha = 0.0.
-                            current_alpha = np.clip(1.0 - (abs(z) / 2.0), 0.0, 1.0)
+                            # GAUSSIAN ALPHA: Exponentially stricter than linear
+                            # Perfect match (z=0) = 1.0
+                            # 1 StdDev away (z=1) = 0.60
+                            # 2 StdDev away (z=2) = 0.13 (Almost invisible)
+                            current_alpha = np.exp(-0.5 * (z**2))
+
                             if current_alpha > best_alpha:
                                 best_alpha = current_alpha
 
-                        # --- COLOR LOGIC ---
-                        if best_alpha > 0.7:
-                            color = (0, 255, 0)  # Green
-                            thickness = 2
-                        elif best_alpha > 0.1:
-                            color = (0, 255, 255)  # Yellow
-                            thickness = 1
-                        else:
-                            color = (60, 60, 60)  # Dark Gray
-                            thickness = 1
+                        # --- NEW STRICT COLOR LOGIC ---
+                        if best_alpha > 0.85:  # Hard Green only for center-hits
+                            color = (0, 255, 0)
+                            thick = 2
+                        elif best_alpha > 0.4:  # Yellow for "Close enough"
+                            color = (0, 255, 255)
+                            thick = 1
+                        else:  # Gray out everything else
+                            color = (45, 45, 45)
+                            thick = 1
 
                         cv2.putText(
                             ui_overlay,
@@ -129,8 +153,13 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.35,
                             color,
-                            thickness,
+                            1 if best_alpha < 0.7 else 2,
                         )
+
+                    # Draw visual markers on main frame
+                    cv2.circle(
+                        frame, (int(tip[0] * w), int(tip[1] * h)), 6, (255, 0, 255), -1
+                    )  # Fingertip
 
                 frame = cv2.addWeighted(frame, 0.5, ui_overlay, 0.8, 0)
                 cv2.imshow("FSL Precision Grid", frame)
