@@ -36,27 +36,23 @@ def create_landmarker():
 
 
 def extract_frame_data(frame, pose_landmarker):
-    """Extracts raw coordinates for pillars and identifies dominant hand."""
     mp_image = mp.Image(
         image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     )
     result = pose_landmarker.detect(mp_image)
-
     if not result.pose_landmarks:
         return None
 
     lms = result.pose_landmarks[0]
+    nose, l_ear, r_ear, l_shl, r_shl = lms[0], lms[7], lms[8], lms[11], lms[12]
+    r_wrist, l_wrist = lms[16], lms[15]
 
-    # 1. Base Landmarks
-    nose = lms[0]
-    l_ear = lms[7]
-    r_ear = lms[8]
-    l_shl = lms[11]
-    r_shl = lms[12]
-    r_wrist = lms[16]
-    l_wrist = lms[15]
+    # --- BODY SCALING (THE FIX) ---
+    # We use shoulder width as our "Unit of Measurement"
+    # This stays consistent regardless of distance to camera.
+    shoulder_width = np.sqrt((l_shl.x - r_shl.x) ** 2 + (l_shl.y - r_shl.y) ** 2)
+    scale = max(shoulder_width, 0.1)  # Safety floor
 
-    # 2. Derive Pillars (Generator Logic)
     head_size = abs(l_shl.y - nose.y)
     pillars = {
         "nose": (nose.x, nose.y),
@@ -69,14 +65,13 @@ def extract_frame_data(frame, pose_landmarker):
         "chest": ((l_shl.x + r_shl.x) / 2, (l_shl.y + r_shl.y) / 2),
     }
 
-    # Use the hand with higher visibility (Dominant Hand Identification)
     hand = (
         (r_wrist.x, r_wrist.y)
         if r_wrist.visibility > l_wrist.visibility
         else (l_wrist.x, l_wrist.y)
     )
 
-    return {"pillars": pillars, "hand": hand}
+    return {"pillars": pillars, "hand": hand, "scale": scale}
 
 
 def generate_signatures():
@@ -109,7 +104,10 @@ def generate_signatures():
                     for p_name in PILLAR_LABELS:
                         p = data["pillars"][p_name]
                         # Euclidean distance calculation
-                        dist = np.sqrt((h[0] - p[0]) ** 2 + (h[1] - p[1]) ** 2)
+                        dist = (
+                            np.sqrt((h[0] - p[0]) ** 2 + (h[1] - p[1]) ** 2)
+                            / data["scale"]
+                        )
                         all_distances[p_name].append(dist)
             cap.release()
 
