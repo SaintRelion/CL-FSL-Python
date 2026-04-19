@@ -1,36 +1,1022 @@
 {
     "BOY": {
         "nose": {
-            "target_touch": 0.2741,
-            "strict_limit": 0.3426
+            "target_touch": 0.0106,
+            "strict_limit": 0.0132
         },
         "left_ear": {
-            "target_touch": 0.4187,
-            "strict_limit": 0.5234
+            "target_touch": 0.2128,
+            "strict_limit": 0.266
         },
         "right_ear": {
-            "target_touch": 0.0967,
-            "strict_limit": 0.1209
+            "target_touch": 0.011,
+            "strict_limit": 0.0137
         },
         "left_shoulder": {
-            "target_touch": 1.0498,
-            "strict_limit": 1.3122
+            "target_touch": 0.5154,
+            "strict_limit": 0.6442
         },
         "right_shoulder": {
-            "target_touch": 0.1466,
-            "strict_limit": 0.1833
+            "target_touch": 0.0337,
+            "strict_limit": 0.0422
         },
         "forehead": {
-            "target_touch": 0.1425,
-            "strict_limit": 0.1781
+            "target_touch": 0.008,
+            "strict_limit": 0.01
         },
         "chin": {
-            "target_touch": 0.2711,
-            "strict_limit": 0.3388
+            "target_touch": 0.0154,
+            "strict_limit": 0.0192
         },
         "chest": {
-            "target_touch": 0.6019,
-            "strict_limit": 0.7524
+            "target_touch": 0.1013,
+            "strict_limit": 0.1266
+        }
+    },
+    "COLD": {
+        "nose": {
+            "target_touch": 0.6029,
+            "strict_limit": 0.7537
+        },
+        "left_ear": {
+            "target_touch": 0.644,
+            "strict_limit": 0.8051
+        },
+        "right_ear": {
+            "target_touch": 0.5103,
+            "strict_limit": 0.6379
+        },
+        "left_shoulder": {
+            "target_touch": 0.0042,
+            "strict_limit": 0.0053
+        },
+        "right_shoulder": {
+            "target_touch": 0.0132,
+            "strict_limit": 0.0165
+        },
+        "forehead": {
+            "target_touch": 0.7394,
+            "strict_limit": 0.9243
+        },
+        "chin": {
+            "target_touch": 0.4259,
+            "strict_limit": 0.5323
+        },
+        "chest": {
+            "target_touch": 0.146,
+            "strict_limit": 0.1825
+        }
+    },
+    "CORRECT": {
+        "nose": {
+            "target_touch": 0.175,
+            "strict_limit": 0.2187
+        },
+        "left_ear": {
+            "target_touch": 0.118,
+            "strict_limit": 0.1475
+        },
+        "right_ear": {
+            "target_touch": 0.124,
+            "strict_limit": 0.155
+        },
+        "left_shoulder": {
+            "target_touch": 0.1351,
+            "strict_limit": 0.1689
+        },
+        "right_shoulder": {
+            "target_touch": 0.0729,
+            "strict_limit": 0.0911
+        },
+        "forehead": {
+            "target_touch": 0.0885,
+            "strict_limit": 0.1106
+        },
+        "chin": {
+            "target_touch": 0.162,
+            "strict_limit": 0.2025
+        },
+        "chest": {
+            "target_touch": 0.0106,
+            "strict_limit": 0.0133
+        }
+    },
+    "DONT_KNOW": {
+        "nose": {
+            "target_touch": 0.1275,
+            "strict_limit": 0.1594
+        },
+        "left_ear": {
+            "target_touch": 0.3132,
+            "strict_limit": 0.3915
+        },
+        "right_ear": {
+            "target_touch": 0.0098,
+            "strict_limit": 0.0122
+        },
+        "left_shoulder": {
+            "target_touch": 0.6612,
+            "strict_limit": 0.8264
+        },
+        "right_shoulder": {
+            "target_touch": 0.0342,
+            "strict_limit": 0.0427
+        },
+        "forehead": {
+            "target_touch": 0.1089,
+            "strict_limit": 0.1361
+        },
+        "chin": {
+            "target_touch": 0.2557,
+            "strict_limit": 0.3196
+        },
+        "chest": {
+            "target_touch": 0.1701,
+            "strict_limit": 0.2126
+        }
+    },
+    "DONT_UNDERSTAND": {
+        "nose": {
+            "target_touch": 0.0742,
+            "strict_limit": 0.0928
+        },
+        "left_ear": {
+            "target_touch": 0.2564,
+            "strict_limit": 0.3205
+        },
+        "right_ear": {
+            "target_touch": 0.011,
+            "strict_limit": 0.0137
+        },
+        "left_shoulder": {
+            "target_touch": 0.6636,
+            "strict_limit": 0.8295
+        },
+        "right_shoulder": {
+            "target_touch": 0.1204,
+            "strict_limit": 0.1505
+        },
+        "forehead": {
+            "target_touch": 0.0533,
+            "strict_limit": 0.0667
+        },
+        "chin": {
+            "target_touch": 0.0614,
+            "strict_limit": 0.0768
+        },
+        "chest": {
+            "target_touch": 0.1636,
+            "strict_limit": 0.2045
+        }
+    },
+    "FAST": {
+        "nose": {
+            "target_touch": 0.1319,
+            "strict_limit": 0.1649
+        },
+        "left_ear": {
+            "target_touch": 0.2694,
+            "strict_limit": 0.3368
+        },
+        "right_ear": {
+            "target_touch": 0.0025,
+            "strict_limit": 0.0031
+        },
+        "left_shoulder": {
+            "target_touch": 0.5741,
+            "strict_limit": 0.7176
+        },
+        "right_shoulder": {
+            "target_touch": 0.0186,
+            "strict_limit": 0.0232
+        },
+        "forehead": {
+            "target_touch": 0.173,
+            "strict_limit": 0.2162
+        },
+        "chin": {
+            "target_touch": 0.1167,
+            "strict_limit": 0.1459
+        },
+        "chest": {
+            "target_touch": 0.1313,
+            "strict_limit": 0.1642
+        }
+    },
+    "GIRL": {
+        "nose": {
+            "target_touch": 0.458,
+            "strict_limit": 0.5724
+        },
+        "left_ear": {
+            "target_touch": 0.7056,
+            "strict_limit": 0.882
+        },
+        "right_ear": {
+            "target_touch": 0.4642,
+            "strict_limit": 0.5802
+        },
+        "left_shoulder": {
+            "target_touch": 0.516,
+            "strict_limit": 0.645
+        },
+        "right_shoulder": {
+            "target_touch": 0.0277,
+            "strict_limit": 0.0347
+        },
+        "forehead": {
+            "target_touch": 0.6814,
+            "strict_limit": 0.8517
+        },
+        "chin": {
+            "target_touch": 0.2463,
+            "strict_limit": 0.3079
+        },
+        "chest": {
+            "target_touch": 0.0314,
+            "strict_limit": 0.0393
+        }
+    },
+    "GOOD_AFTERNOON": {
+        "nose": {
+            "target_touch": 0.0081,
+            "strict_limit": 0.0102
+        },
+        "left_ear": {
+            "target_touch": 0.2038,
+            "strict_limit": 0.2547
+        },
+        "right_ear": {
+            "target_touch": 0.1205,
+            "strict_limit": 0.1506
+        },
+        "left_shoulder": {
+            "target_touch": 0.3547,
+            "strict_limit": 0.4434
+        },
+        "right_shoulder": {
+            "target_touch": 0.0027,
+            "strict_limit": 0.0034
+        },
+        "forehead": {
+            "target_touch": 0.0525,
+            "strict_limit": 0.0656
+        },
+        "chin": {
+            "target_touch": 0.0174,
+            "strict_limit": 0.0218
+        },
+        "chest": {
+            "target_touch": 0.0128,
+            "strict_limit": 0.016
+        }
+    },
+    "GOOD_EVENING": {
+        "nose": {
+            "target_touch": 0.0465,
+            "strict_limit": 0.0581
+        },
+        "left_ear": {
+            "target_touch": 0.1167,
+            "strict_limit": 0.1459
+        },
+        "right_ear": {
+            "target_touch": 0.0369,
+            "strict_limit": 0.0461
+        },
+        "left_shoulder": {
+            "target_touch": 0.3948,
+            "strict_limit": 0.4935
+        },
+        "right_shoulder": {
+            "target_touch": 0.0352,
+            "strict_limit": 0.044
+        },
+        "forehead": {
+            "target_touch": 0.0909,
+            "strict_limit": 0.1136
+        },
+        "chin": {
+            "target_touch": 0.0107,
+            "strict_limit": 0.0134
+        },
+        "chest": {
+            "target_touch": 0.0019,
+            "strict_limit": 0.0024
+        }
+    },
+    "GOOD_MORNING": {
+        "nose": {
+            "target_touch": 0.0563,
+            "strict_limit": 0.0704
+        },
+        "left_ear": {
+            "target_touch": 0.0202,
+            "strict_limit": 0.0252
+        },
+        "right_ear": {
+            "target_touch": 0.0296,
+            "strict_limit": 0.037
+        },
+        "left_shoulder": {
+            "target_touch": 0.462,
+            "strict_limit": 0.5775
+        },
+        "right_shoulder": {
+            "target_touch": 0.0053,
+            "strict_limit": 0.0066
+        },
+        "forehead": {
+            "target_touch": 0.0452,
+            "strict_limit": 0.0565
+        },
+        "chin": {
+            "target_touch": 0.0171,
+            "strict_limit": 0.0213
+        },
+        "chest": {
+            "target_touch": 0.0284,
+            "strict_limit": 0.0355
+        }
+    },
+    "HELLO": {
+        "nose": {
+            "target_touch": 0.1679,
+            "strict_limit": 0.2099
+        },
+        "left_ear": {
+            "target_touch": 0.3029,
+            "strict_limit": 0.3787
+        },
+        "right_ear": {
+            "target_touch": 0.0194,
+            "strict_limit": 0.0242
+        },
+        "left_shoulder": {
+            "target_touch": 0.5884,
+            "strict_limit": 0.7355
+        },
+        "right_shoulder": {
+            "target_touch": 0.0322,
+            "strict_limit": 0.0403
+        },
+        "forehead": {
+            "target_touch": 0.1562,
+            "strict_limit": 0.1952
+        },
+        "chin": {
+            "target_touch": 0.1532,
+            "strict_limit": 0.1915
+        },
+        "chest": {
+            "target_touch": 0.1325,
+            "strict_limit": 0.1656
+        }
+    },
+    "HOT": {
+        "nose": {
+            "target_touch": 0.0026,
+            "strict_limit": 0.0033
+        },
+        "left_ear": {
+            "target_touch": 0.2234,
+            "strict_limit": 0.2792
+        },
+        "right_ear": {
+            "target_touch": 0.086,
+            "strict_limit": 0.1075
+        },
+        "left_shoulder": {
+            "target_touch": 0.3025,
+            "strict_limit": 0.3781
+        },
+        "right_shoulder": {
+            "target_touch": 0.1333,
+            "strict_limit": 0.1666
+        },
+        "forehead": {
+            "target_touch": 0.2284,
+            "strict_limit": 0.2855
+        },
+        "chin": {
+            "target_touch": 0.0136,
+            "strict_limit": 0.017
+        },
+        "chest": {
+            "target_touch": 0.0129,
+            "strict_limit": 0.0161
+        }
+    },
+    "HOW_ARE_YOU": {
+        "nose": {
+            "target_touch": 0.2676,
+            "strict_limit": 0.3345
+        },
+        "left_ear": {
+            "target_touch": 0.5028,
+            "strict_limit": 0.6285
+        },
+        "right_ear": {
+            "target_touch": 0.4373,
+            "strict_limit": 0.5466
+        },
+        "left_shoulder": {
+            "target_touch": 0.2157,
+            "strict_limit": 0.2696
+        },
+        "right_shoulder": {
+            "target_touch": 0.2573,
+            "strict_limit": 0.3217
+        },
+        "forehead": {
+            "target_touch": 0.5343,
+            "strict_limit": 0.6679
+        },
+        "chin": {
+            "target_touch": 0.0486,
+            "strict_limit": 0.0607
+        },
+        "chest": {
+            "target_touch": 0.0056,
+            "strict_limit": 0.007
+        }
+    },
+    "IM_FINE": {
+        "nose": {
+            "target_touch": 0.4864,
+            "strict_limit": 0.608
+        },
+        "left_ear": {
+            "target_touch": 0.6821,
+            "strict_limit": 0.8527
+        },
+        "right_ear": {
+            "target_touch": 0.5861,
+            "strict_limit": 0.7326
+        },
+        "left_shoulder": {
+            "target_touch": 0.4312,
+            "strict_limit": 0.539
+        },
+        "right_shoulder": {
+            "target_touch": 0.0392,
+            "strict_limit": 0.0491
+        },
+        "forehead": {
+            "target_touch": 0.6981,
+            "strict_limit": 0.8726
+        },
+        "chin": {
+            "target_touch": 0.3007,
+            "strict_limit": 0.3759
+        },
+        "chest": {
+            "target_touch": 0.0016,
+            "strict_limit": 0.002
+        }
+    },
+    "KNOW": {
+        "nose": {
+            "target_touch": 0.1627,
+            "strict_limit": 0.2034
+        },
+        "left_ear": {
+            "target_touch": 0.4001,
+            "strict_limit": 0.5001
+        },
+        "right_ear": {
+            "target_touch": 0.0307,
+            "strict_limit": 0.0384
+        },
+        "left_shoulder": {
+            "target_touch": 0.5278,
+            "strict_limit": 0.6598
+        },
+        "right_shoulder": {
+            "target_touch": 0.0145,
+            "strict_limit": 0.0181
+        },
+        "forehead": {
+            "target_touch": 0.1733,
+            "strict_limit": 0.2166
+        },
+        "chin": {
+            "target_touch": 0.1164,
+            "strict_limit": 0.1455
+        },
+        "chest": {
+            "target_touch": 0.0396,
+            "strict_limit": 0.0495
+        }
+    },
+    "MAN": {
+        "nose": {
+            "target_touch": 0.0204,
+            "strict_limit": 0.0255
+        },
+        "left_ear": {
+            "target_touch": 0.1928,
+            "strict_limit": 0.241
+        },
+        "right_ear": {
+            "target_touch": 0.0099,
+            "strict_limit": 0.0123
+        },
+        "left_shoulder": {
+            "target_touch": 0.5396,
+            "strict_limit": 0.6745
+        },
+        "right_shoulder": {
+            "target_touch": 0.0524,
+            "strict_limit": 0.0655
+        },
+        "forehead": {
+            "target_touch": 0.0049,
+            "strict_limit": 0.0062
+        },
+        "chin": {
+            "target_touch": 0.0178,
+            "strict_limit": 0.0222
+        },
+        "chest": {
+            "target_touch": 0.0396,
+            "strict_limit": 0.0495
+        }
+    },
+    "NICE_TO_MEET_YOU": {
+        "nose": {
+            "target_touch": 0.0087,
+            "strict_limit": 0.0108
+        },
+        "left_ear": {
+            "target_touch": 0.0616,
+            "strict_limit": 0.077
+        },
+        "right_ear": {
+            "target_touch": 0.0141,
+            "strict_limit": 0.0176
+        },
+        "left_shoulder": {
+            "target_touch": 0.0097,
+            "strict_limit": 0.0121
+        },
+        "right_shoulder": {
+            "target_touch": 0.0827,
+            "strict_limit": 0.1034
+        },
+        "forehead": {
+            "target_touch": 0.0581,
+            "strict_limit": 0.0726
+        },
+        "chin": {
+            "target_touch": 0.0269,
+            "strict_limit": 0.0337
+        },
+        "chest": {
+            "target_touch": 0.0325,
+            "strict_limit": 0.0406
+        }
+    },
+    "NO": {
+        "nose": {
+            "target_touch": 0.0631,
+            "strict_limit": 0.0789
+        },
+        "left_ear": {
+            "target_touch": 0.2225,
+            "strict_limit": 0.2782
+        },
+        "right_ear": {
+            "target_touch": 0.0411,
+            "strict_limit": 0.0513
+        },
+        "left_shoulder": {
+            "target_touch": 0.564,
+            "strict_limit": 0.705
+        },
+        "right_shoulder": {
+            "target_touch": 0.0296,
+            "strict_limit": 0.037
+        },
+        "forehead": {
+            "target_touch": 0.0224,
+            "strict_limit": 0.028
+        },
+        "chin": {
+            "target_touch": 0.0167,
+            "strict_limit": 0.0209
+        },
+        "chest": {
+            "target_touch": 0.1016,
+            "strict_limit": 0.127
+        }
+    },
+    "PARENTS": {
+        "nose": {
+            "target_touch": 0.004,
+            "strict_limit": 0.005
+        },
+        "left_ear": {
+            "target_touch": 0.211,
+            "strict_limit": 0.2637
+        },
+        "right_ear": {
+            "target_touch": 0.0226,
+            "strict_limit": 0.0282
+        },
+        "left_shoulder": {
+            "target_touch": 0.3025,
+            "strict_limit": 0.3781
+        },
+        "right_shoulder": {
+            "target_touch": 0.0961,
+            "strict_limit": 0.1201
+        },
+        "forehead": {
+            "target_touch": 0.0052,
+            "strict_limit": 0.0065
+        },
+        "chin": {
+            "target_touch": 0.0124,
+            "strict_limit": 0.0155
+        },
+        "chest": {
+            "target_touch": 0.0302,
+            "strict_limit": 0.0378
+        }
+    },
+    "SEE_YOU_TOMORROW": {
+        "nose": {
+            "target_touch": 0.0107,
+            "strict_limit": 0.0134
+        },
+        "left_ear": {
+            "target_touch": 0.2082,
+            "strict_limit": 0.2602
+        },
+        "right_ear": {
+            "target_touch": 0.0234,
+            "strict_limit": 0.0293
+        },
+        "left_shoulder": {
+            "target_touch": 0.34,
+            "strict_limit": 0.4249
+        },
+        "right_shoulder": {
+            "target_touch": 0.0452,
+            "strict_limit": 0.0565
+        },
+        "forehead": {
+            "target_touch": 0.0721,
+            "strict_limit": 0.0901
+        },
+        "chin": {
+            "target_touch": 0.0226,
+            "strict_limit": 0.0283
+        },
+        "chest": {
+            "target_touch": 0.0035,
+            "strict_limit": 0.0044
+        }
+    },
+    "SLOW": {
+        "nose": {
+            "target_touch": 0.0444,
+            "strict_limit": 0.0555
+        },
+        "left_ear": {
+            "target_touch": 0.0324,
+            "strict_limit": 0.0405
+        },
+        "right_ear": {
+            "target_touch": 0.2728,
+            "strict_limit": 0.341
+        },
+        "left_shoulder": {
+            "target_touch": 0.0625,
+            "strict_limit": 0.0782
+        },
+        "right_shoulder": {
+            "target_touch": 0.3575,
+            "strict_limit": 0.4469
+        },
+        "forehead": {
+            "target_touch": 0.0724,
+            "strict_limit": 0.0905
+        },
+        "chin": {
+            "target_touch": 0.069,
+            "strict_limit": 0.0862
+        },
+        "chest": {
+            "target_touch": 0.0943,
+            "strict_limit": 0.1179
+        }
+    },
+    "THANK_YOU": {
+        "nose": {
+            "target_touch": 0.1184,
+            "strict_limit": 0.1481
+        },
+        "left_ear": {
+            "target_touch": 0.1573,
+            "strict_limit": 0.1967
+        },
+        "right_ear": {
+            "target_touch": 0.0447,
+            "strict_limit": 0.0559
+        },
+        "left_shoulder": {
+            "target_touch": 0.0365,
+            "strict_limit": 0.0456
+        },
+        "right_shoulder": {
+            "target_touch": 0.0094,
+            "strict_limit": 0.0117
+        },
+        "forehead": {
+            "target_touch": 0.2765,
+            "strict_limit": 0.3456
+        },
+        "chin": {
+            "target_touch": 0.0507,
+            "strict_limit": 0.0633
+        },
+        "chest": {
+            "target_touch": 0.1028,
+            "strict_limit": 0.1285
+        }
+    },
+    "TODAY": {
+        "nose": {
+            "target_touch": 0.6968,
+            "strict_limit": 0.871
+        },
+        "left_ear": {
+            "target_touch": 0.6789,
+            "strict_limit": 0.8486
+        },
+        "right_ear": {
+            "target_touch": 0.4801,
+            "strict_limit": 0.6002
+        },
+        "left_shoulder": {
+            "target_touch": 0.093,
+            "strict_limit": 0.1163
+        },
+        "right_shoulder": {
+            "target_touch": 0.0142,
+            "strict_limit": 0.0177
+        },
+        "forehead": {
+            "target_touch": 0.7137,
+            "strict_limit": 0.8921
+        },
+        "chin": {
+            "target_touch": 0.6884,
+            "strict_limit": 0.8605
+        },
+        "chest": {
+            "target_touch": 0.4807,
+            "strict_limit": 0.6008
+        }
+    },
+    "TOMORROW": {
+        "nose": {
+            "target_touch": 0.1127,
+            "strict_limit": 0.1408
+        },
+        "left_ear": {
+            "target_touch": 0.3085,
+            "strict_limit": 0.3857
+        },
+        "right_ear": {
+            "target_touch": 0.0855,
+            "strict_limit": 0.1069
+        },
+        "left_shoulder": {
+            "target_touch": 0.7104,
+            "strict_limit": 0.8879
+        },
+        "right_shoulder": {
+            "target_touch": 0.0163,
+            "strict_limit": 0.0204
+        },
+        "forehead": {
+            "target_touch": 0.2533,
+            "strict_limit": 0.3166
+        },
+        "chin": {
+            "target_touch": 0.1488,
+            "strict_limit": 0.186
+        },
+        "chest": {
+            "target_touch": 0.2159,
+            "strict_limit": 0.2699
+        }
+    },
+    "UNDERSTAND": {
+        "nose": {
+            "target_touch": 0.1631,
+            "strict_limit": 0.2039
+        },
+        "left_ear": {
+            "target_touch": 0.3637,
+            "strict_limit": 0.4546
+        },
+        "right_ear": {
+            "target_touch": 0.0133,
+            "strict_limit": 0.0166
+        },
+        "left_shoulder": {
+            "target_touch": 0.6015,
+            "strict_limit": 0.7519
+        },
+        "right_shoulder": {
+            "target_touch": 0.0402,
+            "strict_limit": 0.0503
+        },
+        "forehead": {
+            "target_touch": 0.1168,
+            "strict_limit": 0.1461
+        },
+        "chin": {
+            "target_touch": 0.0661,
+            "strict_limit": 0.0827
+        },
+        "chest": {
+            "target_touch": 0.1244,
+            "strict_limit": 0.1554
+        }
+    },
+    "WOMAN": {
+        "nose": {
+            "target_touch": 0.192,
+            "strict_limit": 0.24
+        },
+        "left_ear": {
+            "target_touch": 0.3718,
+            "strict_limit": 0.4648
+        },
+        "right_ear": {
+            "target_touch": 0.0263,
+            "strict_limit": 0.0329
+        },
+        "left_shoulder": {
+            "target_touch": 0.5848,
+            "strict_limit": 0.731
+        },
+        "right_shoulder": {
+            "target_touch": 0.0494,
+            "strict_limit": 0.0617
+        },
+        "forehead": {
+            "target_touch": 0.1953,
+            "strict_limit": 0.2441
+        },
+        "chin": {
+            "target_touch": 0.151,
+            "strict_limit": 0.1888
+        },
+        "chest": {
+            "target_touch": 0.0915,
+            "strict_limit": 0.1143
+        }
+    },
+    "WRONG": {
+        "nose": {
+            "target_touch": 0.4014,
+            "strict_limit": 0.5018
+        },
+        "left_ear": {
+            "target_touch": 0.6177,
+            "strict_limit": 0.7721
+        },
+        "right_ear": {
+            "target_touch": 0.5012,
+            "strict_limit": 0.6265
+        },
+        "left_shoulder": {
+            "target_touch": 0.48,
+            "strict_limit": 0.5999
+        },
+        "right_shoulder": {
+            "target_touch": 0.2034,
+            "strict_limit": 0.2542
+        },
+        "forehead": {
+            "target_touch": 0.6389,
+            "strict_limit": 0.7986
+        },
+        "chin": {
+            "target_touch": 0.2065,
+            "strict_limit": 0.2581
+        },
+        "chest": {
+            "target_touch": 0.0267,
+            "strict_limit": 0.0334
+        }
+    },
+    "YES": {
+        "nose": {
+            "target_touch": 0.1752,
+            "strict_limit": 0.219
+        },
+        "left_ear": {
+            "target_touch": 0.3387,
+            "strict_limit": 0.4234
+        },
+        "right_ear": {
+            "target_touch": 0.0391,
+            "strict_limit": 0.0488
+        },
+        "left_shoulder": {
+            "target_touch": 0.6268,
+            "strict_limit": 0.7836
+        },
+        "right_shoulder": {
+            "target_touch": 0.018,
+            "strict_limit": 0.0225
+        },
+        "forehead": {
+            "target_touch": 0.2299,
+            "strict_limit": 0.2874
+        },
+        "chin": {
+            "target_touch": 0.1424,
+            "strict_limit": 0.178
+        },
+        "chest": {
+            "target_touch": 0.1549,
+            "strict_limit": 0.1937
+        }
+    },
+    "YESTERDAY": {
+        "nose": {
+            "target_touch": 0.3554,
+            "strict_limit": 0.4442
+        },
+        "left_ear": {
+            "target_touch": 0.606,
+            "strict_limit": 0.7575
+        },
+        "right_ear": {
+            "target_touch": 0.2418,
+            "strict_limit": 0.3023
+        },
+        "left_shoulder": {
+            "target_touch": 0.8931,
+            "strict_limit": 1.1164
+        },
+        "right_shoulder": {
+            "target_touch": 0.0164,
+            "strict_limit": 0.0205
+        },
+        "forehead": {
+            "target_touch": 0.5567,
+            "strict_limit": 0.6959
+        },
+        "chin": {
+            "target_touch": 0.24,
+            "strict_limit": 0.2999
+        },
+        "chest": {
+            "target_touch": 0.394,
+            "strict_limit": 0.4924
+        }
+    },
+    "YOURE_WELCOME": {
+        "nose": {
+            "target_touch": 0.0117,
+            "strict_limit": 0.0146
+        },
+        "left_ear": {
+            "target_touch": 0.2027,
+            "strict_limit": 0.2534
+        },
+        "right_ear": {
+            "target_touch": 0.0384,
+            "strict_limit": 0.0479
+        },
+        "left_shoulder": {
+            "target_touch": 0.4906,
+            "strict_limit": 0.6133
+        },
+        "right_shoulder": {
+            "target_touch": 0.2762,
+            "strict_limit": 0.3453
+        },
+        "forehead": {
+            "target_touch": 0.122,
+            "strict_limit": 0.1525
+        },
+        "chin": {
+            "target_touch": 0.0046,
+            "strict_limit": 0.0058
+        },
+        "chest": {
+            "target_touch": 0.0186,
+            "strict_limit": 0.0233
         }
     }
 }

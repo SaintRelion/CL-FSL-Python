@@ -154,7 +154,7 @@ def generate_signatures():
         allowed_shapes = [
             s
             for s, count in shape_counts.items()
-            if (count / total_valid_frames) > 0.20
+            if (count / total_valid_frames) > 0.05
         ]
         gesture_shapes[label] = allowed_shapes
 

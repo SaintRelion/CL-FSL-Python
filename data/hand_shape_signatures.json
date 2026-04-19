@@ -1,7 +1,157 @@
 {
     "BOY": [
         "FIVE",
+        "L_SHAPE",
         "OPEN_MOUTH",
+        "CLOSED_MOUTH"
+    ],
+    "COLD": [
+        "FIST"
+    ],
+    "CORRECT": [
+        "FIST",
+        "L_SHAPE",
+        "INDEX_FINGER"
+    ],
+    "DONT_KNOW": [
+        "FIST",
+        "FIVE",
+        "CLOSED_MOUTH"
+    ],
+    "DONT_UNDERSTAND": [
+        "INDEX_FINGER",
+        "L_SHAPE"
+    ],
+    "FAST": [
+        "FIST",
+        "L_SHAPE"
+    ],
+    "GIRL": [
+        "FIVE",
+        "L_SHAPE",
+        "FIST",
+        "THUMB"
+    ],
+    "GOOD_AFTERNOON": [
+        "THUMB",
+        "FIST",
+        "CLOSED_MOUTH",
+        "2L_SHAPE",
+        "FIVE"
+    ],
+    "GOOD_EVENING": [
+        "THUMB",
+        "FIST",
+        "CLOSED_MOUTH",
+        "FIVE",
+        "2L_SHAPE"
+    ],
+    "GOOD_MORNING": [
+        "THUMB",
+        "FIST",
+        "FIVE",
+        "2L_SHAPE"
+    ],
+    "HELLO": [
+        "FIST",
+        "CLOSED_MOUTH",
+        "FIVE",
+        "OPEN_MOUTH"
+    ],
+    "HOT": [
+        "INDEX_FINGER",
+        "FIVE",
+        "OPEN_MOUTH",
+        "TWO"
+    ],
+    "HOW_ARE_YOU": [
+        "INDEX_FINGER",
+        "FIST",
+        "THUMB",
+        "FIVE",
+        "2L_SHAPE",
+        "THUMB_FINGER"
+    ],
+    "IM_FINE": [
+        "FIVE",
+        "OPEN_MOUTH",
+        "INDEX_FINGER",
+        "CLOSED_MOUTH"
+    ],
+    "KNOW": [
+        "CLOSED_MOUTH",
+        "FIVE",
+        "FIST"
+    ],
+    "MAN": [
+        "CLOSED_MOUTH",
+        "FIST",
+        "OPEN_MOUTH"
+    ],
+    "NICE_TO_MEET_YOU": [
+        "FIVE",
+        "2L_SHAPE",
+        "CLOSED_MOUTH",
+        "INDEX_FINGER",
+        "L_SHAPE"
+    ],
+    "NO": [
+        "TWO",
+        "FIST"
+    ],
+    "PARENTS": [
+        "FIST",
+        "FIVE"
+    ],
+    "SEE_YOU_TOMORROW": [
+        "THUMB",
+        "INDEX_FINGER",
+        "FIST"
+    ],
+    "SLOW": [
+        "FIVE",
+        "INDEX_FINGER"
+    ],
+    "THANK_YOU": [
+        "FIST",
+        "2L_SHAPE",
+        "FIVE"
+    ],
+    "TODAY": [
+        "THUMB_FINGER",
+        "L_SHAPE",
+        "FIST",
+        "FIVE",
+        "2L_SHAPE"
+    ],
+    "TOMORROW": [
+        "FIST",
+        "THUMB",
+        "INDEX_FINGER"
+    ],
+    "UNDERSTAND": [
+        "FIST",
+        "INDEX_FINGER"
+    ],
+    "WOMAN": [
+        "THUMB",
+        "FIST",
+        "CLOSED_MOUTH"
+    ],
+    "WRONG": [
+        "FIST"
+    ],
+    "YES": [
+        "INDEX_FINGER",
+        "FIST"
+    ],
+    "YESTERDAY": [
+        "INDEX_FINGER",
+        "FIST"
+    ],
+    "YOURE_WELCOME": [
+        "FIST",
+        "INDEX_FINGER",
         "CLOSED_MOUTH"
     ]
 }
