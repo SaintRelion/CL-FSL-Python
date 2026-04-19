@@ -2,35 +2,35 @@
     "BOY": {
         "nose": {
             "target_touch": 0.2741,
-            "strict_limit": 0.3837
+            "strict_limit": 0.3426
         },
         "left_ear": {
             "target_touch": 0.4187,
-            "strict_limit": 0.5862
+            "strict_limit": 0.5234
         },
         "right_ear": {
             "target_touch": 0.0967,
-            "strict_limit": 0.1354
+            "strict_limit": 0.1209
         },
         "left_shoulder": {
             "target_touch": 1.0498,
-            "strict_limit": 1.4697
+            "strict_limit": 1.3122
         },
         "right_shoulder": {
             "target_touch": 0.1466,
-            "strict_limit": 0.2053
+            "strict_limit": 0.1833
         },
         "forehead": {
             "target_touch": 0.1425,
-            "strict_limit": 0.1995
+            "strict_limit": 0.1781
         },
         "chin": {
             "target_touch": 0.2711,
-            "strict_limit": 0.3795
+            "strict_limit": 0.3388
         },
         "chest": {
             "target_touch": 0.6019,
-            "strict_limit": 0.8426
+            "strict_limit": 0.7524
         }
     }
 }

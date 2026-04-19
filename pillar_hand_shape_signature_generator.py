@@ -25,7 +25,7 @@ PILLAR_LABELS = [
     "chest",
 ]
 
-# 1. Load Hand Shape Labels
+# Load Hand Shape Labels
 with open(SHAPE_LABELS_PATH, "r") as f:
     SHAPE_LABELS = [line.strip() for line in f.readlines()]
 
@@ -84,12 +84,12 @@ def generate_signatures():
     for label in labels:
         print(f"Processing: {label}")
         shape_counts = {}
-        all_frames_data = []  # List of {'pillars', 'tip', 'scale', 'shape'}
+        all_frames_data = []
 
         path = os.path.join(ROOT_DIR, label)
         videos = sorted([v for v in os.listdir(path) if v.endswith((".mp4", ".avi"))])
 
-        # --- PASS 1: COLLECT ALL RAW DATA & COUNT SHAPES ---
+        # PASS 1: COLLECT DATA & PREDICT SHAPES
         for v in videos:
             cap = cv2.VideoCapture(os.path.join(path, v))
             while cap.isOpened():
@@ -108,15 +108,18 @@ def generate_signatures():
                     p_lms = p_res.pose_landmarks[0]
                     h_lms = h_res.hand_landmarks[0]
 
-                    # 1. Detect Shape
+                    # Detect Shape
                     feats = extract_hand_shape_features(h_lms)
                     s_interp.set_tensor(s_in[0]["index"], feats)
                     s_interp.invoke()
                     probs = s_interp.get_tensor(s_out[0]["index"])[0]
                     shape_name = SHAPE_LABELS[np.argmax(probs)]
-                    shape_counts[shape_name] = shape_counts.get(shape_name, 0) + 1
 
-                    # 2. Store Temporal Data
+                    # Only count confident shapes
+                    if probs[np.argmax(probs)] > 0.7:
+                        shape_counts[shape_name] = shape_counts.get(shape_name, 0) + 1
+
+                    # Store Temporal Data
                     l_shl, r_shl = p_lms[11], p_lms[12]
                     scale = max(
                         np.sqrt((l_shl.x - r_shl.x) ** 2 + (l_shl.y - r_shl.y) ** 2),
@@ -145,15 +148,17 @@ def generate_signatures():
                     )
             cap.release()
 
-        # --- PASS 2: FILTER & GENERATE SIGNATURES ---
-        # Only keep shapes that appear in > 15% of the video
-        total_frames = sum(shape_counts.values())
+        # PASS 2: FILTER PILLAR STATS BY ALLOWED SHAPES
+        total_valid_frames = sum(shape_counts.values())
+        # A shape must exist in at least 20% of the video to be a "key"
         allowed_shapes = [
-            s for s, count in shape_counts.items() if (count / total_frames) > 0.15
+            s
+            for s, count in shape_counts.items()
+            if (count / total_valid_frames) > 0.20
         ]
         gesture_shapes[label] = allowed_shapes
 
-        # Record distances ONLY for allowed shapes
+        # Record distances ONLY when a valid hand shape is active
         video_min_dists = {p: [] for p in PILLAR_LABELS}
         current_video_mins = {p: 99.0 for p in PILLAR_LABELS}
 
@@ -169,7 +174,7 @@ def generate_signatures():
                     if dist < current_video_mins[p_name]:
                         current_video_mins[p_name] = dist
 
-        # Aggregate the "Peak" Activation
+        # Build strict signature
         signature = {}
         for p_name in PILLAR_LABELS:
             target = (
@@ -177,11 +182,13 @@ def generate_signatures():
             )
             signature[p_name] = {
                 "target_touch": round(float(target), 4),
-                "strict_limit": round(float(target * 1.4), 4),  # 40% Tolerance
+                "strict_limit": round(
+                    float(target * 1.25), 4
+                ),  # Very strict 25% buffer
             }
         gesture_pillars[label] = signature
 
-    # Export Dual JSONs
+    # Export
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
     with open(os.path.join(OUTPUT_DIR, "pillar_signatures.json"), "w") as f:
@@ -189,7 +196,7 @@ def generate_signatures():
     with open(os.path.join(OUTPUT_DIR, "hand_shape_signatures.json"), "w") as f:
         json.dump(gesture_shapes, f, indent=4)
 
-    print("\nSUCCESS: Dual-Gated Signatures Generated.")
+    print("\nGeneration Complete. Pillar stats are now shape-gated.")
 
 
 if __name__ == "__main__":
